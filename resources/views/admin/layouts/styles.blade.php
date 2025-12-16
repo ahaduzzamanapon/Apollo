@@ -272,19 +272,15 @@
 
     main {
         flex: 1;
-        overflow: hidden;
+        overflow-y: auto; /* Enable scrolling for main content area */
         padding: 1.5rem;
-        display: flex;
-        flex-direction: column;
+        display: block;
     }
 
     .container-fluid {
-        height: 100%;
         display: flex;
         flex-direction: column;
         padding-bottom: 1rem;
-        overflow-y: auto;
-        padding-right: 0.5rem; /* Prevent scrollbar overlap */
     }
 
     /* Full Height Cards for Tables */

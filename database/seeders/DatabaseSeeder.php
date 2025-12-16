@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             MenuSeeder::class,
             ThemePresetSeeder::class,
+            ApolloPermissionSeeder::class,
+            ApolloDataSeeder::class,
         ]);
     }
 }

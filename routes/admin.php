@@ -34,6 +34,15 @@ Route::prefix('admin')->group(function () {
         Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings.index')->middleware('permission:settings.browse');
         Route::post('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update')->middleware('permission:settings.edit');
 
+        // Apollo Routes
+        Route::resource('doctors', \App\Http\Controllers\Admin\DoctorController::class);
+        Route::resource('reports', \App\Http\Controllers\Admin\ReportCategoryController::class);
+        Route::resource('ledgers', \App\Http\Controllers\Admin\AccountsLedgerController::class);
+        Route::resource('expenses', \App\Http\Controllers\Admin\ExpenseController::class);
+        Route::resource('patients', \App\Http\Controllers\Admin\PatientController::class);
+        
+        Route::get('commission', [\App\Http\Controllers\Admin\ReportBillingController::class, 'commission'])->name('commission.index');
+
         require base_path('routes/crud.php');
     });
 });
