@@ -3,7 +3,17 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <h2>New Patient Entry</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>New Patient Entry</h2>
+            <div>
+                <a href="{{ route('admin.patients.due') }}" class="btn btn-warning me-2">
+                    <i class="bi bi-exclamation-circle me-1"></i> Due List
+                </a>
+                <a href="{{ route('patients.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-list-ul me-1"></i> All Patient List
+                </a>
+            </div>
+        </div>
         <form action="{{ route('patients.store') }}" method="POST">
             @csrf
             

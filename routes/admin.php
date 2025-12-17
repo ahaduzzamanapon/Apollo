@@ -39,6 +39,8 @@ Route::prefix('admin')->group(function () {
         Route::resource('reports', \App\Http\Controllers\Admin\ReportCategoryController::class);
         Route::resource('ledgers', \App\Http\Controllers\Admin\AccountsLedgerController::class);
         Route::resource('expenses', \App\Http\Controllers\Admin\ExpenseController::class);
+        
+        Route::get('patients/due', [\App\Http\Controllers\Admin\PatientController::class, 'due'])->name('admin.patients.due');
         Route::resource('patients', \App\Http\Controllers\Admin\PatientController::class);
         
         Route::get('commission', [\App\Http\Controllers\Admin\ReportBillingController::class, 'commission'])->name('commission.index');

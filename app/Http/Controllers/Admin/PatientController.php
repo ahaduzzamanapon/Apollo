@@ -19,6 +19,15 @@ class PatientController extends Controller
         return view('admin.patients.index', compact('reports'));
     }
 
+    public function due()
+    {
+        $reports = PatientReport::with(['patient', 'referenceDoctor'])
+                    ->where('due_amount', '>', 0)
+                    ->latest()
+                    ->paginate(20);
+        return view('admin.patients.due', compact('reports'));
+    }
+
     public function create()
     {
         $doctors = Doctor::all();
