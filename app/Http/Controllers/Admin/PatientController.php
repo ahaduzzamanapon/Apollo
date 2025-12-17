@@ -258,7 +258,7 @@ class PatientController extends Controller
             ]);
         }
 
-        return redirect()->route('patients.show', $report->id)->with('success', 'Report Entry Created Successfully');
+        return redirect()->route('admin.patients.show', $report->id)->with('success', 'Report Entry Created Successfully');
     }
 
     public function addPayment(Request $request)
