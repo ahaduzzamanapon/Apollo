@@ -28,7 +28,6 @@
                          <button class="btn btn-secondary w-100" onclick="resetFilters()">Reset</button>
                     </div>
                     <div class="col-md-2 d-flex gap-1">
-                        <button class="btn btn-success w-100" onclick="exportData('true')" title="CSV"><i class="bi bi-file-earmark-excel"></i></button>
                         <button class="btn btn-danger w-100" onclick="exportData('pdf')" title="PDF"><i class="bi bi-file-earmark-pdf"></i></button>
                     </div>
                 </div>

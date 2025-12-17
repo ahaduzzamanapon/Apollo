@@ -49,7 +49,7 @@
                             <label>Age</label>
                             <input type="number" name="age" class="form-control" required>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label>Gender</label>
                             <select name="gender" class="form-control">
                                 <option value="Male">Male</option>
@@ -57,7 +57,7 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label>Date of Birth</label>
                             <input type="date" name="dob" class="form-control">
                         </div>
@@ -67,12 +67,20 @@
                         </div>
                         <div class="col-md-3 mb-3">
                             <label>Reference Doctor</label>
-                            <select name="reference_doctor_id" class="form-control search-select">
-                                <option value="">Select Doctor</option>
-                                @foreach($doctors as $doctor)
-                                    <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
-                                @endforeach
-                            </select>
+                            <div class="input-group">
+                                <select name="reference_doctor_id" class="form-control search-select">
+                                    <option value="">Select Doctor</option>
+                                    @foreach($doctors as $doctor)
+                                        <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="d-block">&nbsp;</label>
+                            <a href="{{ route('admin.doctors.create') }}" class="btn btn-outline-primary w-100" target="_blank">
+                                <i class="bi bi-plus-lg"></i> Add New
+                            </a>
                         </div>
                     </div>
                 </div>

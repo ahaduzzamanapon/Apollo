@@ -36,7 +36,7 @@ Route::prefix('admin')->group(function () {
         Route::post('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update')->middleware('permission:settings.edit');
 
         // Apollo Routes
-        Route::resource('doctors', \App\Http\Controllers\Admin\DoctorController::class);
+        Route::resource('doctors', \App\Http\Controllers\Admin\DoctorController::class)->names('admin.doctors');
         Route::resource('reports', \App\Http\Controllers\Admin\ReportCategoryController::class);
         Route::resource('ledgers', \App\Http\Controllers\Admin\AccountsLedgerController::class);
         Route::resource('expenses', \App\Http\Controllers\Admin\ExpenseController::class);
