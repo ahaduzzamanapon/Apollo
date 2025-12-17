@@ -7,13 +7,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BankTransaction extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
-        'date',
-        'bank_name',
-        'account_no',
-        'type',
+        'bank_id',
+        'trans_type',
         'amount',
+        'trans_date',
+        'note',
     ];
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
+    }
 }

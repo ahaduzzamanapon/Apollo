@@ -60,10 +60,40 @@
                                 <th class="text-end">{{ $report->due_amount }}</th>
                             </tr>
                         </tbody>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Payment History -->
+                    <h5 class="mt-4 mb-3">Payment History</h5>
+                    <table class="table table-bordered table-sm">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Method</th>
+                                <th>Amount</th>
+                                <th>Collected By</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($report->payments as $payment)
+                            <tr>
+                                <td>{{ $payment->created_at->format('Y-m-d h:i A') }}</td>
+                                <td>{{ $payment->payment_method }}</td>
+                                <td class="fw-bold">{{ $payment->amount }}</td>
+                                <td>{{ $payment->collectedBy->name ?? 'N/A' }}</td>
+                                <td>{{ $payment->remarks }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No payments recorded yet.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
                     </table>
                     
                     <div class="text-center mt-5">
-                        <button onclick="window.print()" class="btn btn-primary no-print">Print Invoice</button>
+                        <a href="{{ route('patients.download_invoice', $report->id) }}" class="btn btn-danger no-print"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
                         <a href="{{ route('patients.index') }}" class="btn btn-secondary no-print">Back to List</a>
                     </div>
                 </div>

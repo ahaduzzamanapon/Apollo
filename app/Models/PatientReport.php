@@ -35,4 +35,9 @@ class PatientReport extends Model
     {
         return $this->hasMany(PatientTest::class);
     }
+
+    public function payments()
+    {
+        return $this->hasMany(PatientPayment::class);
+    }
 }

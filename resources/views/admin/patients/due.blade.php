@@ -13,6 +13,26 @@
         </div>
 
         <div class="card card-fixed shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by Name, Mobile, Code...">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" id="startDate" class="form-control" placeholder="Start Date" onchange="filterData()">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" id="endDate" class="form-control" placeholder="End Date" onchange="filterData()">
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                         <button class="btn btn-secondary w-100" onclick="resetFilters()">Reset</button>
+                    </div>
+                    <div class="col-md-2 d-flex gap-1">
+                        <button class="btn btn-success w-100" onclick="exportData('true')" title="CSV"><i class="bi bi-file-earmark-excel"></i></button>
+                        <button class="btn btn-danger w-100" onclick="exportData('pdf')" title="PDF"><i class="bi bi-file-earmark-pdf"></i></button>
+                    </div>
+                </div>
+            </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped mb-0">
@@ -29,38 +49,55 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @forelse($reports as $report)
-                            <tr>
-                                <td>{{ $report->report_code }}</td>
-                                <td>{{ $report->report_date }}</td>
-                                <td>{{ $report->patient->name }}</td>
-                                <td>{{ $report->patient->mobile }}</td>
-                                <td>{{ $report->referenceDoctor->name ?? 'Self' }}</td>
-                                <td>{{ $report->final_amount }}</td>
-                                <td>{{ $report->paid_amount }}</td>
-                                <td>
-                                    <span class="badge bg-danger fs-6">{{ $report->due_amount }} TK</span>
-                                </td>
-                                <td>
-                                    <a href="{{ route('patients.show', $report->id) }}" class="btn btn-sm btn-info text-white">
-                                        <i class="bi bi-eye"></i> View/Pay
-                                    </a>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="9" class="text-center py-4 text-muted">Thinking positive! No outstanding dues found.</td>
-                            </tr>
-                            @endforelse
+                        <tbody id="tableBody">
+                            @include('admin.patients.table_body')
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="card-footer bg-white border-top">
-                {{ $reports->links('pagination::bootstrap-5') }}
-            </div>
         </div>
     </div>
 </div>
+
+@include('admin.patients.payment_modal')
+
+<script>
+    function filterData() {
+        let search = document.getElementById('searchInput').value;
+        let start_date = document.getElementById('startDate').value;
+        let end_date = document.getElementById('endDate').value;
+
+        let query = `?search=${search}&start_date=${start_date}&end_date=${end_date}`;
+
+        fetch("{{ route('admin.patients.due') }}" + query, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('tableBody').innerHTML = html;
+        });
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        filterData();
+    }
+
+    function exportData(type) {
+        let search = document.getElementById('searchInput').value;
+        let start_date = document.getElementById('startDate').value;
+        let end_date = document.getElementById('endDate').value;
+        let query = `?export=${type}&search=${search}&start_date=${start_date}&end_date=${end_date}`;
+        window.location.href = "{{ route('admin.patients.due') }}" + query;
+    }
+
+    // Live search
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        filterData();
+    });
+</script>
 @endsection

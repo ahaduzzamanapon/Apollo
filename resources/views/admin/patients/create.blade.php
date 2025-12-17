@@ -1,6 +1,17 @@
 @extends('admin.layouts.app')
 
 @section('content')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        padding: 5px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px !important;
+    }
+</style>
 <div class="row">
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -81,7 +92,6 @@
                                 </option>
                             @endforeach
                         </select>
-                        <button type="button" class="btn btn-success mt-2" onclick="addTest()">Add Test</button>
                     </div>
 
                     <table class="table table-bordered">
@@ -101,17 +111,13 @@
                                 <th><input type="number" id="totalAmount" class="form-control" readonly value="0"></th>
                             </tr>
                             <tr>
-                                <th colspan="2" class="text-end">
-                                    <div class="d-flex justify-content-end align-items-center">
-                                        <label class="me-2">Discount Type</label>
-                                        <select id="discountType" class="form-control form-control-sm" style="width: 100px;" onchange="calculateTotal()">
-                                            <option value="flat">Flat</option>
-                                            <option value="percent">Percent (%)</option>
-                                        </select>
-                                    </div>
-                                </th>
+                                <th colspan="2" class="text-end">Discount</th>
                                 <th>
-                                    <input type="number" name="discount" id="discount" class="form-control" value="0" oninput="calculateTotal()">
+                                    <div class="d-flex gap-2">
+                                        <input type="number" id="discountFlat" class="form-control" placeholder="Flat" oninput="calculateTotal()">
+                                        <input type="number" id="discountPercent" class="form-control" placeholder="%" oninput="calculateTotal()">
+                                        <input type="hidden" name="discount" id="finalDiscount" value="0">
+                                    </div>
                                 </th>
                             </tr>
                             <tr>
@@ -120,7 +126,18 @@
                             </tr>
                             <tr>
                                 <th colspan="2" class="text-end">Paid Amount</th>
-                                <th><input type="number" name="paid_amount" id="paidAmount" class="form-control" value="0" oninput="calculateTotal()"></th>
+                                <th>
+                                    <input type="number" name="paid_amount" id="paidAmount" class="form-control mb-2" value="0" oninput="calculateTotal()">
+                                    
+                                    <div class="d-flex gap-2">
+                                        <select name="payment_method" class="form-control form-control-sm">
+                                            <option value="Cash">Cash</option>
+                                            <option value="Card">Card</option>
+                                            <option value="Mobile Banking">Mobile Banking</option>
+                                        </select>
+                                        <input type="text" name="remarks" class="form-control form-control-sm" placeholder="Remarks">
+                                    </div>
+                                </th>
                             </tr>
                             <tr>
                                 <th colspan="2" class="text-end">Due Amount</th>
@@ -136,7 +153,31 @@
     </div>
 </div>
 
+@endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+    $(document).ready(function() {
+        $('#testSelect').select2({
+            placeholder: "Select a Test...",
+            allowClear: true,
+            width: '100%'
+        });
+
+        // Bind Select2 select event
+        $('#testSelect').on('select2:select', function (e) {
+            addTest();
+        });
+        
+        // Also initialize other selects if needed, e.g. doctor reference
+        $('.search-select').select2({
+            placeholder: "Select Doctor",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+
     let total = 0;
 
     function addTest() {
@@ -151,6 +192,7 @@
         // Check if already added
         if(document.getElementById('row-'+id)) {
             alert('Test already added!');
+            $('#testSelect').val(null).trigger('change'); // Reset Select2
             return;
         }
 
@@ -166,8 +208,12 @@
 
         total += price;
         updateCalculations();
+        
+        $('#testSelect').val(null).trigger('change'); // Reset Select2 for next input
     }
-
+    
+    // ... (rest of functions: removeTest, updateCalculations, calculateTotal) ...
+   
     function removeTest(id, price) {
         document.getElementById('row-'+id).remove();
         total -= price;
@@ -180,28 +226,26 @@
     }
 
     function calculateTotal() {
-        let discountInput = parseFloat(document.getElementById('discount').value) || 0;
-        const discountType = document.getElementById('discountType').value;
-        const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
+        let flatDiscount = parseFloat(document.getElementById('discountFlat').value) || 0;
+        let percentDiscount = parseFloat(document.getElementById('discountPercent').value) || 0;
+        let paid = parseFloat(document.getElementById('paidAmount').value) || 0;
         
-        let discountAmount = 0;
-
-        if (discountType === 'percent') {
-            discountAmount = (total * discountInput) / 100;
-        } else {
-            discountAmount = discountInput;
-        }
+        let totalDiscount = flatDiscount + ((total * percentDiscount) / 100);
 
         // Prevent discount from exceeding total
-        if(discountAmount > total) {
-             discountAmount = total;
+        if(totalDiscount > total) {
+             totalDiscount = total;
         }
         
-        const net = Math.round(total - discountAmount);
+        // Update hidden input used for submission
+        document.getElementById('finalDiscount').value = Math.round(totalDiscount);
+
+        const net = Math.round(total - totalDiscount);
         const due = Math.round(net - paid);
 
         document.getElementById('netPayable').value = net;
         document.getElementById('dueAmount').value = due;
     }
 </script>
-@endsection
+@endpush
+

@@ -7,9 +7,32 @@
         <div class="row">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
+                    <div class="card-header bg-white py-3">
+                        <div class="row g-2">
+                             <div class="col-md-12 mb-2">
+                                <h5 class="card-title mb-0">Expense List</h5>
+                             </div>
+                            <div class="col-md-6">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+                            </div>
+                            <div class="col-md-6 d-flex gap-1">
+                                <button class="btn btn-success w-100" onclick="exportData('true')" title="CSV"><i class="bi bi-file-earmark-excel"></i></button>
+                                <button class="btn btn-danger w-100" onclick="exportData('pdf')" title="PDF"><i class="bi bi-file-earmark-pdf"></i></button>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="date" id="startDate" class="form-control" placeholder="Start" onchange="filterData()">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="date" id="endDate" class="form-control" placeholder="End" onchange="filterData()">
+                            </div>
+                            <div class="col-md-12">
+                                <button class="btn btn-secondary w-100" onclick="resetFilters()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-bordered mb-0">
+                            <thead class="bg-light">
                                 <tr>
                                     <th>Date</th>
                                     <th>Ledger</th>
@@ -18,27 +41,52 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach($expenses as $expense)
-                                <tr>
-                                    <td>{{ $expense->date }}</td>
-                                    <td>{{ $expense->ledger->name }}</td>
-                                    <td>{{ $expense->description }}</td>
-                                    <td>{{ $expense->amount }}</td>
-                                    <td>
-                                        <form action="{{ route('expenses.destroy', $expense->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @endforeach
+                            <tbody id="tableBody">
+                                @include('admin.expenses.table_body')
                             </tbody>
                         </table>
-                        {{ $expenses->links() }}
                     </div>
                 </div>
+
+<script>
+    function filterData() {
+        let search = document.getElementById('searchInput').value;
+        let start_date = document.getElementById('startDate').value;
+        let end_date = document.getElementById('endDate').value;
+
+        let query = `?search=${search}&start_date=${start_date}&end_date=${end_date}`;
+
+        fetch("{{ route('expenses.index') }}" + query, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('tableBody').innerHTML = html;
+        });
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        filterData();
+    }
+
+    function exportData(type) {
+        let search = document.getElementById('searchInput').value;
+        let start_date = document.getElementById('startDate').value;
+        let end_date = document.getElementById('endDate').value;
+        let query = `?export=${type}&search=${search}&start_date=${start_date}&end_date=${end_date}`;
+        window.location.href = "{{ route('expenses.index') }}" + query;
+    }
+
+    // Live search
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        filterData();
+    });
+</script>
             </div>
             <div class="col-md-4">
                 <div class="card">
