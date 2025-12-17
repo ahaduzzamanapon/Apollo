@@ -29,6 +29,22 @@
                         <label for="password_confirmation" class="form-label">Confirm Password</label>
                         <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
                     </div>
+
+                    <div class="col-12 mt-3">
+                        <label class="form-label fw-bold">Assign Roles</label>
+                        <div class="row">
+                            @foreach($roles as $role)
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="roles[]" value="{{ $role->id }}" id="role_{{ $role->id }}">
+                                        <label class="form-check-label" for="role_{{ $role->id }}">
+                                            {{ $role->name }}
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-4 d-flex justify-content-end gap-2">
