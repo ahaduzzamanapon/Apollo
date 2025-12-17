@@ -36,7 +36,7 @@ class DashboardController extends Controller
         // 6. Total Daily Income & List
         $todayIncomeQuery = PatientPayment::whereDate('created_at', Carbon::today());
         $todayIncome = $todayIncomeQuery->sum('amount');
-        $todayIncomeList = $todayIncomeQuery->with('patient')->get();
+        $todayIncomeList = $todayIncomeQuery->with('report.patient')->get();
         
         // 3. Total Daily Profit
         $todayProfit = $todayIncome - $todayExpense;
@@ -47,7 +47,7 @@ class DashboardController extends Controller
         })->where('commission_amount', '>', 0);
         
         $totalDailyHonorarium = $dailyHonorariumQuery->sum('commission_amount');
-        $dailyHonorariumList = $dailyHonorariumQuery->with(['doctor', 'test', 'report.patient'])->get();
+        $dailyHonorariumList = $dailyHonorariumQuery->with(['category', 'report.referenceDoctor', 'report.patient'])->get();
 
         // 7. Total Daily Patient & List
         $todayPatientsQuery = Patient::whereDate('created_at', Carbon::today()); // Registered today

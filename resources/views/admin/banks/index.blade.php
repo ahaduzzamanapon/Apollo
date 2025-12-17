@@ -3,59 +3,120 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Bank Management</h2>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBankModal">
-                <i class="bi bi-plus-circle"></i> Add New Bank
-            </button>
         </div>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <div class="card">
+        <!-- Bank Selection -->
+        <div class="card mb-4">
             <div class="card-body">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>SL</th>
-                            <th>Bank Name</th>
-                            <th>Account No</th>
-                            <th>Total Deposit</th>
-                            <th>Total Withdraw</th>
-                            <th>Current Balance</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($banks as $key => $bank)
-                            @php
-                                $balance = ($bank->total_deposit ?? 0) - ($bank->total_withdraw ?? 0);
-                            @endphp
-                            <tr>
-                                <td>{{ $key + 1 }}</td>
-                                <td>{{ $bank->name }}</td>
-                                <td>{{ $bank->account_no }}</td>
-                                <td class="text-end">{{ number_format($bank->total_deposit ?? 0, 2) }}</td>
-                                <td class="text-end">{{ number_format($bank->total_withdraw ?? 0, 2) }}</td>
-                                <td class="text-end fw-bold">{{ number_format($balance, 2) }}</td>
-                                <td>
-                                    <a href="{{ route('banks.show', $bank->id) }}" class="btn btn-info btn-sm text-white">
-                                        <i class="bi bi-eye"></i> View
-                                    </a>
-                                    <form action="{{ route('banks.destroy', $bank->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this bank?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <form action="{{ route('banks.index') }}" method="GET" id="bankSelectForm">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <label class="fw-bold mb-1">Select Bank Account:</label>
+                            <select name="bank_id" class="form-control select2" onchange="document.getElementById('bankSelectForm').submit()">
+                                @foreach($banks as $bank)
+                                    <option value="{{ $bank->id }}" {{ $activeBank && $activeBank->id == $bank->id ? 'selected' : '' }}>
+                                        {{ $bank->name }} ({{ $bank->account_no }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="d-block mb-1">&nbsp;</label>
+                            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#addBankModal">
+                                <i class="bi bi-plus-circle"></i> Add New Bank
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+
+        @if($activeBank)
+            <!-- Bank Details -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5>Total Deposit</h5>
+                            <h3>{{ number_format($total_deposit, 2) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            <h5>Total Withdraw</h5>
+                            <h3>{{ number_format($total_withdraw, 2) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5>Current Balance</h5>
+                            <h3>{{ number_format($balance, 2) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions & Transactions -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Transaction History - {{ $activeBank->name }}</h5>
+                    <div>
+                        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#depositModal">
+                            <i class="bi bi-arrow-down-circle"></i> Deposit
+                        </button>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                            <i class="bi bi-arrow-up-circle"></i> Withdraw
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                    <th>User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($transactions as $trans)
+                                    <tr>
+                                        <td>{{ $trans->trans_date }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $trans->trans_type == 'Deposit' ? 'success' : 'danger' }}">
+                                                {{ $trans->trans_type }}
+                                            </span>
+                                        </td>
+                                        <td>{{ number_format($trans->amount, 2) }}</td>
+                                        <td>{{ $trans->note }}</td>
+                                        <td>{{ $trans->user_id ?? 'Admin' }}</td> <!-- Assuming user relation exists or nullable -->
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">No transactions found.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="alert alert-info">Please add a bank account to get started.</div>
+        @endif
     </div>
 </div>
 
@@ -87,4 +148,84 @@
         </div>
     </div>
 </div>
+
+@if($activeBank)
+<!-- Deposit Modal -->
+<div class="modal fade" id="depositModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Deposit to {{ $activeBank->name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('banks.transaction.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="bank_id" value="{{ $activeBank->id }}">
+                <input type="hidden" name="trans_type" value="Deposit">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Amount</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Date</label>
+                        <input type="date" name="trans_date" class="form-control" value="{{ date('Y-m-d') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Note</label>
+                        <input type="text" name="note" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Confirm Deposit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div class="modal fade" id="withdrawModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Withdraw from {{ $activeBank->name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('banks.transaction.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="bank_id" value="{{ $activeBank->id }}">
+                <input type="hidden" name="trans_type" value="Withdraw">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Amount</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Date</label>
+                        <input type="date" name="trans_date" class="form-control" value="{{ date('Y-m-d') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Note</label>
+                        <input type="text" name="note" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Confirm Withdraw</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            width: '100%'
+        });
+    });
+</script>
+@endsection
 @endsection

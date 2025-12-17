@@ -46,7 +46,7 @@ class DoctorController extends Controller
             }
         }
 
-        return redirect()->route('doctors.index')->with('success', 'Doctor created successfully.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor created successfully.');
     }
 
     public function edit(Doctor $doctor)
@@ -82,12 +82,12 @@ class DoctorController extends Controller
             }
         }
 
-        return redirect()->route('doctors.index')->with('success', 'Doctor updated successfully.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor updated successfully.');
     }
 
     public function destroy(Doctor $doctor)
     {
         $doctor->delete();
-        return redirect()->route('doctors.index')->with('success', 'Doctor deleted successfully.');
+        return redirect()->route('admin.doctors.index')->with('success', 'Doctor deleted successfully.');
     }
 }

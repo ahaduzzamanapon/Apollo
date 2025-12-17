@@ -15,10 +15,9 @@
                             <div class="col-md-6">
                                 <input type="text" id="searchInput" class="form-control" placeholder="Search...">
                             </div>
-                            <div class="col-md-6 d-flex gap-1">
-                                <button class="btn btn-success w-100" onclick="exportData('true')" title="CSV"><i class="bi bi-file-earmark-excel"></i></button>
+                            <div class="col-md-2 d-flex gap-1">
                                 <button class="btn btn-danger w-100" onclick="exportData('pdf')" title="PDF"><i class="bi bi-file-earmark-pdf"></i></button>
-                            </div>
+                        </div>
                             <div class="col-md-6">
                                 <input type="date" id="startDate" class="form-control" placeholder="Start" onchange="filterData()">
                             </div>

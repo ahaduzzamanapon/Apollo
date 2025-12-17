@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <h2>Edit Doctor</h2>
-        <form action="{{ route('doctors.update', $doctor->id) }}" method="POST">
+        <form action="{{ route('admin.doctors.update', $doctor->id) }}" method="POST">
             @csrf
             @method('PUT')
             <div class="card mb-4">
@@ -65,7 +65,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Update Doctor</button>
-            <a href="{{ route('doctors.index') }}" class="btn btn-secondary">Cancel</a>
+            <a href="{{ route('admin.doctors.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>

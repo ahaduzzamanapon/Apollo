@@ -9,17 +9,35 @@ use Illuminate\Http\Request;
 
 class BankController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $banks = Bank::withSum(['transactions as total_deposit' => function($q) {
-            $q->where('trans_type', 'Deposit');
-        }], 'amount')
-        ->withSum(['transactions as total_withdraw' => function($q) {
-            $q->where('trans_type', 'Withdraw');
-        }], 'amount')
-        ->get();
-        
-        return view('admin.banks.index', compact('banks'));
+        $banks = Bank::all();
+        $activeBank = null;
+        $total_deposit = 0;
+        $total_withdraw = 0;
+        $balance = 0;
+        $transactions = collect();
+
+        if ($request->has('bank_id')) {
+            $activeBank = $banks->firstWhere('id', $request->bank_id);
+        } else {
+            $activeBank = $banks->first();
+        }
+
+        if ($activeBank) {
+            // Load transactions for calculations
+            // Optimization: We could do this with aggregates if list is huge, but for now loading relations is fine
+            $activeBank->load(['transactions' => function($q) {
+                $q->orderBy('trans_date', 'desc')->orderBy('id', 'desc');
+            }]);
+
+            $total_deposit = $activeBank->transactions->where('trans_type', 'Deposit')->sum('amount');
+            $total_withdraw = $activeBank->transactions->where('trans_type', 'Withdraw')->sum('amount');
+            $balance = $total_deposit - $total_withdraw;
+            $transactions = $activeBank->transactions;
+        }
+
+        return view('admin.banks.index', compact('banks', 'activeBank', 'total_deposit', 'total_withdraw', 'balance', 'transactions'));
     }
 
     public function store(Request $request)

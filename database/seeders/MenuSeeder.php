@@ -18,17 +18,17 @@ class MenuSeeder extends Seeder
             ['id' => 1, 'title' => 'Dashboard', 'route' => 'admin.dashboard', 'icon' => 'bi bi-speedometer2', 'parent_id' => NULL, 'order' => 1, 'created_at' => '2025-12-16 10:27:18', 'updated_at' => '2025-12-16 10:27:18'],
             
             // 2. New Patient (Order 2) - [NEW]
-            ['id' => 19, 'title' => 'New Patient', 'route' => 'patients.create', 'icon' => 'bi bi-person-plus', 'parent_id' => NULL, 'order' => 2, 'created_at' => '2025-12-16 10:40:38', 'updated_at' => '2025-12-16 10:40:38'],
+            ['id' => 19, 'title' => 'New Patient', 'route' => 'admin.patients.create', 'icon' => 'bi bi-person-plus', 'parent_id' => NULL, 'order' => 2, 'created_at' => '2025-12-16 10:40:38', 'updated_at' => '2025-12-16 10:40:38'],
 
             // 3. Patient Billing (Order 3) - [Shifted]
-            ['id' => 14, 'title' => 'Patient Billing', 'route' => 'patients.index', 'icon' => 'fa-solid fa-house-flag', 'parent_id' => NULL, 'order' => 3, 'created_at' => NULL, 'updated_at' => '2025-12-16 10:40:38'],
+            ['id' => 14, 'title' => 'Patient Billing', 'route' => 'admin.patients.index', 'icon' => 'fa-solid fa-house-flag', 'parent_id' => NULL, 'order' => 3, 'created_at' => NULL, 'updated_at' => '2025-12-16 10:40:38'],
 
             // 4. Due List (Order 4) - [NEW]
             ['id' => 20, 'title' => 'Due List', 'route' => 'admin.patients.due', 'icon' => 'bi bi-currency-exchange', 'parent_id' => NULL, 'order' => 4, 'created_at' => now(), 'updated_at' => now()],
 
             // 5. Apollo Center (Order 5) - [Shifted]
             ['id' => 11, 'title' => 'Apollo Center', 'route' => NULL, 'icon' => 'bi-hospital', 'parent_id' => NULL, 'order' => 5, 'created_at' => NULL, 'updated_at' => '2025-12-16 10:40:21'],
-            ['id' => 12, 'title' => 'Doctors', 'route' => 'doctors.index', 'icon' => NULL, 'parent_id' => 11, 'order' => 1, 'created_at' => NULL, 'updated_at' => NULL],
+            ['id' => 12, 'title' => 'Doctors', 'route' => 'admin.doctors.index', 'icon' => NULL, 'parent_id' => 11, 'order' => 1, 'created_at' => NULL, 'updated_at' => NULL],
             ['id' => 13, 'title' => 'Test Reports', 'route' => 'reports.index', 'icon' => NULL, 'parent_id' => 11, 'order' => 2, 'created_at' => NULL, 'updated_at' => NULL],
             ['id' => 15, 'title' => 'Commission', 'route' => 'commission.index', 'icon' => NULL, 'parent_id' => 11, 'order' => 3, 'created_at' => NULL, 'updated_at' => '2025-12-16 10:40:21'],
 

@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-md-12">
         <h2 class="mb-4">Doctors</h2>
-        <a href="{{ route('doctors.create') }}" class="btn btn-primary mb-3">Add New Doctor</a>
+        <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary mb-3">Add New Doctor</a>
         <div class="card">
             <div class="card-body">
                 <table class="table table-bordered table-striped">
@@ -36,8 +36,8 @@
                                 @endforeach
                             </td>
                             <td>
-                                <a href="{{ route('doctors.edit', $doctor->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form action="{{ route('doctors.destroy', $doctor->id) }}" method="POST" style="display:inline;">
+                                <a href="{{ route('admin.doctors.edit', $doctor->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <form action="{{ route('admin.doctors.destroy', $doctor->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
