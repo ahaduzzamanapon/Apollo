@@ -6,7 +6,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0 text-danger">Patient Due List</h2>
             <div>
-                <a href="{{ route('patients.create') }}" class="btn btn-primary">
+                <a href="{{ route('admin.patients.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-1"></i> New Patient Entry
                 </a>
             </div>

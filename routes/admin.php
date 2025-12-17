@@ -51,7 +51,7 @@ Route::prefix('admin')->group(function () {
         Route::get('patients/due', [PatientController::class, 'due'])->name('admin.patients.due');
         Route::post('patients/payment', [PatientController::class, 'addPayment'])->name('admin.patients.payment');
         Route::get('patients/{id}/download-invoice', [PatientController::class, 'downloadInvoice'])->name('patients.download_invoice');
-        Route::resource('patients', PatientController::class);
+        Route::resource('patients', PatientController::class)->names('admin.patients');
         
         Route::get('commission', [\App\Http\Controllers\Admin\ReportBillingController::class, 'commission'])->name('commission.index');
 

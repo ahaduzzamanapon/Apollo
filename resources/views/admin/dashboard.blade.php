@@ -2,323 +2,417 @@
 
 @section('content')
 <style>
-    /* Uniform Card Sizing & Modern Style */
+    /* Global Card Style */
     .dashboard-card {
-        height: 100%;
-        min-height: 140px;
         border: none;
-        border-radius: 15px; /* Softer radius */
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Softer shadow */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        transition: transform 0.2s;
+        border-radius: 16px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
         overflow: hidden;
+        height: 100%;
+        min-height: 150px;
     }
     .dashboard-card:hover {
         transform: translateY(-5px);
-    }
-    .card-body {
-        display: flex;
-        align-items: center; /* Align Icon and Text */
-        padding: 1.5rem;
-        width: 100%;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
     }
     
-    /* Icon Definitions */
-    .card-icon {
-        width: 60px;
-        height: 60px;
+    .card-body {
+        position: relative;
+        z-index: 2;
+        padding: 1.5rem;
+    }
+
+    /* Icon Styling */
+    .icon-box {
+        width: 50px;
+        height: 50px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 24px;
-        margin-right: 15px;
-        flex-shrink: 0;
+        margin-bottom: 1rem;
     }
 
-    /* Text Definitions */
-    .stat-content {
-        flex-grow: 1;
-    }
-    .stat-value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        line-height: 1.2;
-    }
-    .stat-label {
-        font-size: 0.9rem;
+    /* Typography */
+    .card-label {
+        font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        opacity: 0.85;
-        margin-bottom: 2px;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        opacity: 0.9;
     }
-    .stat-note {
+    .card-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        line-height: 1.2;
+    }
+    .card-note {
         font-size: 0.8rem;
-        opacity: 0.7;
+        margin-top: 0.5rem;
+        opacity: 0.8;
     }
 
-    /* Daily Gradient Cards */
-    .bg-gradient-daily-income { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
-    .bg-gradient-daily-expense { background: linear-gradient(135deg, #ff512f, #dd2476); color: white; }
-    .bg-gradient-daily-balance { background: linear-gradient(135deg, #2193b0, #6dd5ed); color: white; }
-    .bg-gradient-daily-patients { background: linear-gradient(135deg, #1f1c2c, #928dab); color: white; }
+    /* Section Headers */
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #555;
+        border-left: 4px solid #4e73df;
+        padding-left: 10px;
+        margin-bottom: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    /* Daily Section - Vibrant Gradients */
+    .bg-daily-income { background: linear-gradient(135deg, #0f9b0f 0%, #52c234 100%); color: white; }
+    .bg-daily-expense { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); color: white; }
+    .bg-daily-balance { background: linear-gradient(135deg, #1fa2ff 0%, #12d8fa 100%); color: white; }
+    .bg-daily-honorarium { background: linear-gradient(135deg, #f09819 0%, #edde5d 100%); color: white; }
     
-    /* Monthly/Total Cards (White Modern) */
-    .bg-white-modern { background: white; color: #333; }
+    .bg-daily-income .icon-box { background: rgba(255,255,255,0.2); }
+    .bg-daily-expense .icon-box { background: rgba(255,255,255,0.2); }
+    .bg-daily-balance .icon-box { background: rgba(255,255,255,0.2); }
+    .bg-daily-honorarium .icon-box { background: rgba(255,255,255,0.2); }
+
+    /* Monthly Section - Clean Light + Border Accent */
+    .bg-monthly { background: #fff; border-left: 5px solid #ccc; }
+    .border-income { border-color: #0f9b0f; }
+    .border-expense { border-color: #eb3349; }
+    .border-profit { border-color: #4e73df; }
+    .border-reports { border-color: #6610f2; }
+
+    .bg-monthly .card-value { color: #333; }
+    .bg-monthly .card-label { color: #666; }
+    
+    /* All Time Section - Dark/Solid */
+    .bg-all-due { background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); color: white; }
+    .bg-all-patients { background: linear-gradient(135deg, #232526 0%, #414345 100%); color: white; }
+    .bg-all-due .icon-box { background: rgba(255,255,255,0.2); }
+    .bg-all-patients .icon-box { background: rgba(255,255,255,0.2); }
+
 </style>
 
-<div class="row mb-3">
-    <div class="col-12"><h4 class="text-secondary"><i class="bi bi-speedometer2"></i> Dashboard Overview</h4></div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-secondary"><i class="bi bi-grid-fill"></i> Dashboard</h3>
+    <span class="text-muted">{{ date('l, d F Y') }}</span>
 </div>
 
-<!-- Daily Stats Row (Gradients) -->
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card dashboard-card bg-gradient-daily-income">
-            <div class="card-body">
-                <div class="card-icon bg-white bg-opacity-25"><i class="bi bi-cash-coin"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label">Today's Income</div>
-                    <div class="stat-value">{{ number_format($todayIncome) }}</div>
-                    <div class="stat-note">Patient Payments</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card dashboard-card bg-gradient-daily-expense">
-            <div class="card-body">
-                <div class="card-icon bg-white bg-opacity-25"><i class="bi bi-cart-x"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label">Today's Expense</div>
-                    <div class="stat-value">{{ number_format($todayExpense) }}</div>
-                    <div class="stat-note">Vouchers/Bills</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card dashboard-card bg-gradient-daily-balance">
-            <div class="card-body">
-                <div class="card-icon bg-white bg-opacity-25"><i class="bi bi-wallet2"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label">Today's Balance</div>
-                    <div class="stat-value">{{ number_format($todayBalance) }}</div>
-                    <div class="stat-note">Cash In Hand</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card dashboard-card bg-gradient-daily-patients">
-            <div class="card-body">
-                <div class="card-icon bg-white bg-opacity-25"><i class="bi bi-people"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label">Today's Patients</div>
-                    <div class="stat-value">{{ $todayPatients }}</div>
-                    <div class="stat-note">New Registrations</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- DAILY CARDS SECTION -->
+<style>
+    .daily-card {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.2s;
+    }
+    .daily-card:hover {
+        transform: translateY(-5px);
+        color: inherit;
+    }
+    .card-gradient-1 { background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%); color: white; } /* Due - Reddish/Orange */
+    .card-gradient-2 { background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%); color: white; } /* Report - Blue */
+    .card-gradient-3 { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; } /* Profit - Green */
+    .card-gradient-4 { background: linear-gradient(135deg, #F2994A 0%, #F2C94C 100%); color: white; } /* Honorarium - Yellow/Orange */
+    .card-gradient-5 { background: linear-gradient(135deg, #EB3349 0%, #F45C43 100%); color: white; } /* Expense - Red */
+    .card-gradient-6 { background: linear-gradient(135deg, #0cebeb 0%, #20e3b2 100%, #29ffc6 100%); color: white; } /* Income - Teal/Cyan */
+    .card-gradient-7 { background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%); color: white; } /* Patient - Purple */
+</style>
 
-<!-- Monthly/Total Stats Row (Modern White Style) -->
 <div class="row g-3 mb-4">
+    <!-- 1. Total Daily Due -->
     <div class="col-md-3">
-        <div class="card dashboard-card bg-white-modern">
-            <div class="card-body">
-                <div class="card-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-currency-exchange"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label text-muted">Total Due</div>
-                    <div class="stat-value text-dark">{{ number_format($totalDue) }}</div>
-                    <div class="stat-note text-muted">Receivable Amount</div>
+        <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#dueModal">
+            <div class="card dashboard-card card-gradient-1">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="card-label text-white">Total Daily Due</div>
+                            <div class="card-value text-white">{{ number_format($todayDue) }}</div>
+                        </div>
+                        <div class="icon-box text-white bg-white bg-opacity-25"><i class="bi bi-exclamation-circle-fill"></i></div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
+
+    <!-- 2. Total Test Report Daily -->
     <div class="col-md-3">
-        <div class="card dashboard-card bg-white-modern">
-            <div class="card-body">
-                <div class="card-icon bg-info bg-opacity-10 text-info"><i class="bi bi-graph-up-arrow"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label text-muted">Monthly Income</div>
-                    <div class="stat-value text-dark">{{ number_format($totalMonthlyIncome) }}</div>
-                    <div class="stat-note text-success">Profit: {{ number_format($totalProfit) }}</div>
+        <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#reportModal">
+            <div class="card dashboard-card card-gradient-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="card-label text-white">Total Test Report Daily</div>
+                            <div class="card-value text-white">{{ number_format($todayReports) }}</div>
+                        </div>
+                        <div class="icon-box text-white bg-white bg-opacity-25"><i class="bi bi-file-earmark-medical-fill"></i></div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
+
+    <!-- 3. Total Daily Profit -->
     <div class="col-md-3">
-        <div class="card dashboard-card bg-white-modern">
-            <div class="card-body">
-                <div class="card-icon bg-danger bg-opacity-10 text-danger"><i class="bi bi-credit-card"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label text-muted">Monthly Expense</div>
-                    <div class="stat-value text-dark">{{ number_format($totalMonthlyExpenses) }}</div>
-                    <div class="stat-note text-muted">This Month</div>
+        <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#profitModal">
+            <div class="card dashboard-card card-gradient-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="card-label text-white">Total Daily Profit</div>
+                            <div class="card-value text-white">{{ number_format($todayProfit) }}</div>
+                        </div>
+                        <div class="icon-box text-white bg-white bg-opacity-25"><i class="bi bi-coin"></i></div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card dashboard-card bg-white-modern">
-            <div class="card-body">
-                <div class="card-icon bg-success bg-opacity-10 text-success"><i class="bi bi-person-hearts"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label text-muted">Daily Honorarium</div>
-                    <div class="stat-value text-dark">{{ number_format($totalDailyHonorarium) }}</div>
-                    <div class="stat-note text-muted">Doctor Comm.</div>
-                </div>
-            </div>
-        </div>
+        </a>
     </div>
     
-    <!-- Extra Stats -->
+    <!-- 4. Total Doctor Honorium Daily -->
     <div class="col-md-3">
-        <div class="card dashboard-card bg-white-modern">
-            <div class="card-body">
-                <div class="card-icon bg-secondary bg-opacity-10 text-secondary"><i class="bi bi-file-earmark-text"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label text-muted">Monthly Reports</div>
-                    <div class="stat-value text-dark">{{ $totalMonthlyReports }}</div>
-                    <div class="stat-note text-muted">Tests Conducted</div>
+        <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#honorariumModal">
+            <div class="card dashboard-card card-gradient-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="card-label text-white">Total Honorarium Daily</div>
+                            <div class="card-value text-white">{{ number_format($totalDailyHonorarium) }}</div>
+                        </div>
+                        <div class="icon-box text-white bg-white bg-opacity-25"><i class="bi bi-person-check-fill"></i></div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
-    <div class="col-md-3">
-        <div class="card dashboard-card bg-white-modern">
-            <div class="card-body">
-                <div class="card-icon bg-dark bg-opacity-10 text-dark"><i class="bi bi-people-fill"></i></div>
-                <div class="stat-content">
-                    <div class="stat-label text-muted">Total Patients</div>
-                    <div class="stat-value text-dark">{{ $totalPatients }}</div>
-                    <div class="stat-note text-muted">All Time</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Charts Section -->
-<div class="row mb-4">
-    <div class="col-md-8">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0 text-secondary"><i class="bi bi-graph-up"></i> Income vs Expense (Last 7 Days)</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="incomeExpenseChart"></canvas>
-            </div>
-        </div>
-    </div>
+    
+    <!-- 5. Total Daily Expenses -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0 text-secondary"><i class="bi bi-pie-chart"></i> Overview</h5>
-            </div>
-            <div class="card-body d-flex justify-content-center align-items-center">
-                <canvas id="overviewChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Daily Data Table -->
-<div class="row">
-    <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3 border-0">
-                <h5 class="mb-0 text-secondary"><i class="bi bi-list-task"></i> Today's Transactions</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-4">Time</th>
-                                <th>Description</th>
-                                <th>Type</th>
-                                <th class="text-end pe-4">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($todayTransactions as $trans)
-                            <tr>
-                                <td class="ps-4 text-muted">{{ date('h:i A', strtotime($trans['time'])) }}</td>
-                                <td>{{ $trans['desc'] }}</td>
-                                <td><span class="{{ $trans['class'] }} fw-medium px-2 py-1 rounded bg-light">{{ $trans['type'] }}</span></td>
-                                <td class="text-end pe-4 fw-bold text-dark">{{ number_format($trans['amount'], 2) }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">No transactions found for today.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+        <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#expenseModal">
+            <div class="card dashboard-card card-gradient-5">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="card-label text-white">Total Daily Expenses</div>
+                            <div class="card-value text-white">{{ number_format($todayExpense) }}</div>
+                        </div>
+                        <div class="icon-box text-white bg-white bg-opacity-25"><i class="bi bi-cart-x-fill"></i></div>
+                    </div>
                 </div>
             </div>
+        </a>
+    </div>
+
+    <!-- 6. Total Daily Income -->
+    <div class="col-md-4">
+        <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#incomeModal">
+            <div class="card dashboard-card card-gradient-6">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="card-label text-white">Total Daily Income</div>
+                            <div class="card-value text-white">{{ number_format($todayIncome) }}</div>
+                        </div>
+                        <div class="icon-box text-white bg-white bg-opacity-25"><i class="bi bi-cash"></i></div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- 7. Total Daily Patient -->
+    <div class="col-md-4">
+        <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#patientModal">
+            <div class="card dashboard-card card-gradient-7">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="card-label text-white">Total Daily Patient</div>
+                            <div class="card-value text-white">{{ number_format($todayPatients) }}</div>
+                        </div>
+                        <div class="icon-box text-white bg-white bg-opacity-25"><i class="bi bi-people-fill"></i></div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- MODALS -->
+
+<!-- 1. Due Modal -->
+<div class="modal fade" id="dueModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-1 text-white" style="background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%);">
+                <h5 class="modal-title">Today's Due List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead><tr><th>Invoice</th><th>Patient</th><th>Amount</th><th>Due</th></tr></thead>
+                    <tbody>
+                        @foreach($todayDueList as $item)
+                        <tr><td>#{{ $item->invoice_no }}</td><td>{{ $item->patient->name ?? '-' }}</td><td>{{ $item->total_amount }}</td><td class="text-danger fw-bold">{{ $item->due_amount }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Income vs Expense Chart
-    const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {!! json_encode($chartDates) !!}, // ['12 Dec', '13 Dec'...]
-            datasets: [{
-                label: 'Income',
-                data: {!! json_encode($chartIncome) !!},
-                borderColor: '#2af598',
-                backgroundColor: 'rgba(42, 245, 152, 0.1)',
-                tension: 0.3,
-                fill: true
-            }, {
-                label: 'Expense',
-                data: {!! json_encode($chartExpense) !!},
-                borderColor: '#ff512f',
-                backgroundColor: 'rgba(255, 81, 47, 0.1)',
-                tension: 0.3,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
+<!-- 2. Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-2 text-white" style="background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);">
+                <h5 class="modal-title">Today's Reports</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead><tr><th>Invoice</th><th>Patient</th><th>Tests</th></tr></thead>
+                    <tbody>
+                        @foreach($todayReportList as $item)
+                        <tr><td>#{{ $item->invoice_no }}</td><td>{{ $item->patient->name ?? '-' }}</td><td>{{ $item->tests->count() }} Tests</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-    // Overview Pie Chart (Income vs Expense Total)
-    const ctx2 = document.getElementById('overviewChart').getContext('2d');
-    new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-            labels: ['Total Income', 'Total Expense'],
-            datasets: [{
-                data: [{{ array_sum($chartIncome) }}, {{ array_sum($chartExpense) }}],
-                backgroundColor: ['#2af598', '#ff512f'],
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
-    });
-</script>
+<!-- 3. Profit Modal -->
+<div class="modal fade" id="profitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-3 text-white" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                <h5 class="modal-title">Today's Profit Summary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total Income
+                        <span class="badge bg-success rounded-pill">{{ number_format($todayIncome) }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total Expense
+                        <span class="badge bg-danger rounded-pill">{{ number_format($todayExpense) }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center fw-bold">
+                        Net Profit
+                        <span class="badge bg-primary rounded-pill">{{ number_format($todayProfit) }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. Honorarium Modal -->
+<div class="modal fade" id="honorariumModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-4 text-white" style="background: linear-gradient(135deg, #F2994A 0%, #F2C94C 100%);">
+                <h5 class="modal-title">Today's Doctor Honorarium</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead><tr><th>Doctor</th><th>Test</th><th>Patient</th><th>Comm.</th></tr></thead>
+                    <tbody>
+                        @foreach($dailyHonorariumList as $item)
+                        <tr>
+                            <td>{{ $item->doctor->name ?? '-' }}</td>
+                            <td>{{ $item->test->name ?? '-' }}</td>
+                            <td>{{ $item->report->patient->name ?? '-' }}</td>
+                            <td class="fw-bold">{{ $item->commission_amount }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 5. Expense Modal -->
+<div class="modal fade" id="expenseModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-5 text-white" style="background: linear-gradient(135deg, #EB3349 0%, #F45C43 100%);">
+                <h5 class="modal-title">Today's Expenses</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead><tr><th>Description</th><th>Amount</th><th>Method</th></tr></thead>
+                    <tbody>
+                        @foreach($todayExpenseList as $item)
+                        <tr><td>{{ $item->description }}</td><td class="text-danger fw-bold">{{ $item->amount }}</td><td>{{ $item->payment_method }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 6. Income Modal -->
+<div class="modal fade" id="incomeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-6 text-white" style="background: linear-gradient(135deg, #0cebeb 0%, #20e3b2 100%);">
+                <h5 class="modal-title">Today's Income (Payments)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead><tr><th>Patient</th><th>Amount</th><th>Method</th><th>Time</th></tr></thead>
+                    <tbody>
+                        @foreach($todayIncomeList as $item)
+                        <tr>
+                            <td>{{ $item->patient->name ?? '-' }}</td>
+                            <td class="text-success fw-bold">{{ $item->amount }}</td>
+                            <td>{{ $item->payment_method }}</td>
+                            <td>{{ $item->created_at->format('h:i A') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 7. Patient Modal -->
+<div class="modal fade" id="patientModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-7 text-white" style="background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);">
+                <h5 class="modal-title">Today's New Patients</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead><tr><th>Name</th><th>Mobile</th><th>Age</th></tr></thead>
+                    <tbody>
+                        @foreach($todayPatientList as $item)
+                        <tr><td>{{ $item->name }}</td><td>{{ $item->mobile }}</td><td>{{ $item->age }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

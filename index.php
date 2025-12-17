@@ -1,4 +1,4 @@
 <script>
-    window.location = "https://school-website.wuaze.com/public";
+    window.location = "https://apollo.kesug.com/public";
 </script>
 

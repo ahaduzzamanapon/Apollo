@@ -20,12 +20,12 @@
                 <a href="{{ route('admin.patients.due') }}" class="btn btn-warning me-2">
                     <i class="bi bi-exclamation-circle me-1"></i> Due List
                 </a>
-                <a href="{{ route('patients.index') }}" class="btn btn-secondary">
-                    <i class="bi bi-list-ul me-1"></i> All Patient List
+                <a href="{{ route('admin.patients.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
                 </a>
             </div>
         </div>
-        <form action="{{ route('patients.store') }}" method="POST">
+        <form action="{{ route('admin.patients.store') }}" method="POST">
             @csrf
             
             <!-- Patient Info -->

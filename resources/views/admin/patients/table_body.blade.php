@@ -15,7 +15,7 @@
         @endif
     </td>
     <td>
-        <a href="{{ route('patients.show', $report->id) }}" class="btn btn-sm btn-info text-white" title="View"><i class="bi bi-eye"></i></a>
+        <a href="{{ route('admin.patients.show', $report->id) }}" class="btn btn-sm btn-info text-white" title="View"><i class="bi bi-eye"></i></a>
         @if($report->due_amount > 0)
         <button type="button" class="btn btn-sm btn-success" onclick="openPaymentModal({{ $report->id }}, '{{ $report->report_code }}', {{ $report->due_amount }})" title="Take Payment">
             <i class="bi bi-cash"></i>

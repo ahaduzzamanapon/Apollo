@@ -94,7 +94,7 @@
                     
                     <div class="text-center mt-5">
                         <a href="{{ route('patients.download_invoice', $report->id) }}" class="btn btn-danger no-print"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
-                        <a href="{{ route('patients.index') }}" class="btn btn-secondary no-print">Back to List</a>
+                        <a href="{{ route('admin.patients.index') }}" class="btn btn-secondary no-print">Back to List</a>
                     </div>
                 </div>
             </div>

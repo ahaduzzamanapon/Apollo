@@ -7,7 +7,7 @@
             <h2 class="mb-0">Patient Reports / Billing</h2>
             <div class="d-flex gap-2">
                 <a href="{{ route('admin.patients.due') }}" class="btn btn-warning text-white"><i class="bi bi-exclamation-circle"></i> Due List</a>
-                <a href="{{ route('patients.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Patient Entry</a>
+                <a href="{{ route('admin.patients.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Patient Entry</a>
             </div>
         </div>
 
@@ -68,7 +68,7 @@
 
         let query = `?search=${search}&start_date=${start_date}&end_date=${end_date}`;
 
-        fetch("{{ route('patients.index') }}" + query, {
+        fetch("{{ route('admin.patients.index') }}" + query, {
             headers: {
                 "X-Requested-With": "XMLHttpRequest"
             }
@@ -91,7 +91,7 @@
         let start_date = document.getElementById('startDate').value;
         let end_date = document.getElementById('endDate').value;
         let query = `?export=${type}&search=${search}&start_date=${start_date}&end_date=${end_date}`;
-        window.location.href = "{{ route('patients.index') }}" + query;
+        window.location.href = "{{ route('admin.patients.index') }}" + query;
     }
 
     // Live search

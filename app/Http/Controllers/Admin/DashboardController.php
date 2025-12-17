@@ -18,105 +18,50 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Monthly Stats (Existing)
-        $totalDue = PatientReport::sum('due_amount');
-        $totalMonthlyReports = PatientReport::whereMonth('report_date', Carbon::now()->month)->count();
-        $totalMonthlyIncome = PatientReport::whereMonth('report_date', Carbon::now()->month)->sum('paid_amount');
-        $totalMonthlyExpenses = Expense::whereMonth('date', Carbon::now()->month)->sum('amount');
-        $totalProfit = $totalMonthlyIncome - $totalMonthlyExpenses;
-        $totalPatients = Patient::count();
-        $totalDailyHonorarium = PatientTest::whereHas('report', function($q) {
+        // 1. Total Daily Due & List
+        $todayDueQuery = PatientReport::whereDate('report_date', Carbon::today())->where('due_amount', '>', 0);
+        $todayDue = $todayDueQuery->sum('due_amount');
+        $todayDueList = $todayDueQuery->with('patient')->get();
+        
+        // 2. Total Test Report Daily & List
+        $todayReportsQuery = PatientReport::whereDate('report_date', Carbon::today());
+        $todayReports = $todayReportsQuery->count();
+        $todayReportList = $todayReportsQuery->with('patient')->get();
+        
+        // 5. Total Daily Expense & List
+        $todayExpenseQuery = Expense::whereDate('date', Carbon::today());
+        $todayExpense = $todayExpenseQuery->sum('amount');
+        $todayExpenseList = $todayExpenseQuery->get();
+        
+        // 6. Total Daily Income & List
+        $todayIncomeQuery = PatientPayment::whereDate('created_at', Carbon::today());
+        $todayIncome = $todayIncomeQuery->sum('amount');
+        $todayIncomeList = $todayIncomeQuery->with('patient')->get();
+        
+        // 3. Total Daily Profit
+        $todayProfit = $todayIncome - $todayExpense;
+
+        // 4. Total Doctor Honorarium Daily & List
+        $dailyHonorariumQuery = PatientTest::whereHas('report', function($q) {
             $q->whereDate('report_date', Carbon::today());
-        })->sum('commission_amount');
-
-        // Daily Stats (New)
-        $today = Carbon::today();
+        })->where('commission_amount', '>', 0);
         
-        $todayIncome = PatientPayment::whereDate('created_at', $today)->sum('amount');
-        $todayExpense = Expense::whereDate('date', $today)->sum('amount');
-        
-        $todayDeposit = BankTransaction::whereDate('trans_date', $today)
-                        ->where('trans_type', 'Deposit')
-                        ->sum('amount');
-                        
-        $todayWithdraw = BankTransaction::whereDate('trans_date', $today)
-                        ->where('trans_type', 'Withdraw')
-                        ->sum('amount');
+        $totalDailyHonorarium = $dailyHonorariumQuery->sum('commission_amount');
+        $dailyHonorariumList = $dailyHonorariumQuery->with(['doctor', 'test', 'report.patient'])->get();
 
-        // Cash Balance logic: (Income + Withdraw) - (Expense + Deposit)
-        $todayBalance = ($todayIncome + $todayWithdraw) - ($todayExpense + $todayDeposit);
-
-        $todayPatients = PatientReport::whereDate('report_date', $today)->count();
-
-        // Dashboard Table Data (Today's mixed transactions)
-        $dashboardTrans = collect();
-        
-        $dPayments = PatientPayment::whereDate('created_at', $today)->latest()->get();
-        foreach($dPayments as $p) {
-            $dashboardTrans->push([
-                'time' => $p->created_at,
-                'desc' => 'Payment Rcvd #' . $p->id,
-                'type' => 'Income',
-                'amount' => $p->amount,
-                'class' => 'text-success'
-            ]);
-        }
-        
-        $dExpenses = Expense::whereDate('date', $today)->latest()->get();
-        foreach($dExpenses as $e) {
-            $dashboardTrans->push([
-                'time' => $e->created_at ?? $e->date,
-                'desc' => $e->description ?? 'Expense',
-                'type' => 'Expense',
-                'amount' => $e->amount,
-                'class' => 'text-danger'
-            ]);
-        }
-
-        $dBank = BankTransaction::whereDate('trans_date', $today)->latest()->get();
-        foreach($dBank as $b) {
-            $dashboardTrans->push([
-                'time' => $b->created_at,
-                'desc' => 'Bank ' . $b->trans_type,
-                'type' => $b->trans_type,
-                'amount' => $b->amount,
-                'class' => $b->trans_type == 'Deposit' ? 'text-primary' : 'text-warning'
-            ]);
-        }
-
-        $todayTransactions = $dashboardTrans->sortByDesc('time')->take(10); // Last 10
-
-        // Chart Data (Last 7 Days)
-        $chartDates = [];
-        $chartIncome = [];
-        $chartExpense = [];
-
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
-            $chartDates[] = $date->format('d M');
-            
-            $chartIncome[] = PatientPayment::whereDate('created_at', $date)->sum('amount');
-            $chartExpense[] = Expense::whereDate('date', $date)->sum('amount');
-        }
+        // 7. Total Daily Patient & List
+        $todayPatientsQuery = Patient::whereDate('created_at', Carbon::today()); // Registered today
+        $todayPatients = $todayPatientsQuery->count();
+        $todayPatientList = $todayPatientsQuery->get();
 
         return view('admin.dashboard', compact(
-            'totalDue',
-            'totalMonthlyReports',
-            'totalProfit',
-            'totalDailyHonorarium',
-            'totalMonthlyExpenses',
-            'totalMonthlyIncome',
-            'totalPatients',
-            'todayIncome',
-            'todayExpense',
-            'todayDeposit',
-            'todayWithdraw',
-            'todayBalance',
-            'todayPatients',
-            'todayTransactions',
-            'chartDates',
-            'chartIncome',
-            'chartExpense'
+            'todayDue', 'todayDueList',
+            'todayReports', 'todayReportList',
+            'todayProfit', 
+            'totalDailyHonorarium', 'dailyHonorariumList',
+            'todayExpense', 'todayExpenseList',
+            'todayIncome', 'todayIncomeList',
+            'todayPatients', 'todayPatientList'
         ));
     }
 }
