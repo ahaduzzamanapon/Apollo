@@ -11,6 +11,9 @@ class PatientTest extends Model
         'report_category_id',
         'price',
         'commission_amount',
+        'approval_status',
+        'approved_amount',
+        'approved_at',
     ];
 
     public function report()

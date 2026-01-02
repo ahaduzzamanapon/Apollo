@@ -18,7 +18,9 @@ class DoctorController extends Controller
     public function create()
     {
         $reportCategories = ReportCategory::all();
-        return view('admin.doctors.create', compact('reportCategories'));
+        $latestDoctor = Doctor::with('honorariums')->latest()->first();
+        
+        return view('admin.doctors.create', compact('reportCategories', 'latestDoctor'));
     }
 
     public function store(Request $request)

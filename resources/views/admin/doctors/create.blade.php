@@ -44,14 +44,25 @@
                         </thead>
                         <tbody>
                             @foreach($reportCategories as $category)
+                            @php
+                                $prefillAmount = '';
+                                $prefillPercent = '';
+                                if(isset($latestDoctor)) {
+                                    $hon = $latestDoctor->honorariums->where('report_category_id', $category->id)->first();
+                                    if($hon) {
+                                        $prefillAmount = $hon->amount > 0 ? $hon->amount : '';
+                                        $prefillPercent = $hon->percentage > 0 ? $hon->percentage : '';
+                                    }
+                                }
+                            @endphp
                             <tr>
                                 <td>{{ $category->category_name }}</td>
                                 <td>{{ $category->test_name }}</td>
                                 <td>
-                                    <input type="number" step="0.01" name="honorariums[{{ $category->id }}][amount]" class="form-control" placeholder="0">
+                                    <input type="number" step="0.01" name="honorariums[{{ $category->id }}][amount]" class="form-control" placeholder="0" value="{{ $prefillAmount }}">
                                 </td>
                                 <td>
-                                    <input type="number" step="0.01" name="honorariums[{{ $category->id }}][percentage]" class="form-control" placeholder="0">
+                                    <input type="number" step="0.01" name="honorariums[{{ $category->id }}][percentage]" class="form-control" placeholder="0" value="{{ $prefillPercent }}">
                                 </td>
                             </tr>
                             @endforeach

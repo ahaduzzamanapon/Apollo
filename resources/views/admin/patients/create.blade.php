@@ -70,9 +70,17 @@
                             <input type="text" name="nid" class="form-control">
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label>Reference Doctor</label>
+                            <div class="d-flex justify-content-between">
+                                <label>Reference Doctor</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="refBySomeone" name="ref_by_someone" value="1">
+                                    <label class="form-check-label" for="refBySomeone" style="font-size: 0.8rem;">
+                                        Ref. by Someone (No Comm.)
+                                    </label>
+                                </div>
+                            </div>
                             <div class="input-group">
-                                <select name="reference_doctor_id" class="form-control search-select">
+                                <select name="reference_doctor_id" id="referenceDoctorSelect" class="form-control search-select">
                                     <option value="">Select Doctor</option>
                                     @foreach($doctors as $doctor)
                                         <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
@@ -180,7 +188,20 @@
         // Bind Select2 select event
         $('#testSelect').on('select2:select', function (e) {
             addTest();
+            });
+
+        // Reference by Someone Logic
+        $('#refBySomeone').change(function() {
+            if(this.checked) {
+                // Disable and Clear
+                $('#referenceDoctorSelect').val(null).trigger('change');
+                $('#referenceDoctorSelect').prop('disabled', true);
+            } else {
+                // Enable
+                $('#referenceDoctorSelect').prop('disabled', false);
+            }
         });
+
         
         // Also initialize other selects if needed, e.g. doctor reference
         $('.search-select').select2({

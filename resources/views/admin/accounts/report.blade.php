@@ -3,88 +3,106 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>Accounts Report</h2>
-            <form action="{{ route('accounts.report') }}" method="GET" class="d-flex gap-2">
-                <input type="date" name="date" class="form-control" value="{{ $date }}">
-                <button type="submit" class="btn btn-primary">Filter</button>
-            </form>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card bg-success text-white">
-                    <div class="card-body text-center">
-                        <h5>Today's Income</h5>
-                        <h3>{{ number_format($total_income, 2) }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-danger text-white">
-                    <div class="card-body text-center">
-                        <h5>Today's Expense</h5>
-                        <h3>{{ number_format($total_expense, 2) }}</h3>
-                    </div>
-                </div>
-            </div>
-             <div class="col-md-3">
-                <div class="card bg-warning text-dark">
-                    <div class="card-body text-center">
-                        <h5>Bank Deposit</h5>
-                        <h3>{{ number_format($total_deposit, 2) }}</h3>
-                    </div>
-                </div>
-            </div>
-             <div class="col-md-3">
-                <div class="card bg-info text-dark">
-                    <div class="card-body text-center">
-                        <h5>Bank Withdraw</h5>
-                        <h3>{{ number_format($total_withdraw, 2) }}</h3>
-                    </div>
-                </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Accounts Report Daily Summary</h2>
+            <div>
+                <a href="{{ route('accounts.report', array_merge(request()->all(), ['export' => 'pdf'])) }}" class="btn btn-danger">
+                    <i class="bi bi-file-pdf"></i> Export PDF
+                </a>
+                <a href="{{ route('accounts.report', array_merge(request()->all(), ['export' => 'csv'])) }}" class="btn btn-success ms-2">
+                    <i class="bi bi-file-excel"></i> Export CSV
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary ms-2">
+                    <i class="bi bi-printer"></i> Print
+                </button>
             </div>
         </div>
-
-        <div class="card mb-4 bg-primary text-white">
-            <div class="card-body text-center">
-                <h4>Today's Cash Balance (Income + Withdraw - Expense - Deposit)</h4>
-                <h2>{{ number_format(($total_income + $total_withdraw) - ($total_expense + $total_deposit), 2) }}</h2>
+        
+        <!-- Filters -->
+        <div class="card mb-4 no-print">
+            <div class="card-body">
+                <form action="{{ route('accounts.report') }}" method="GET" class="row align-items-end">
+                    <div class="col-md-4">
+                        <label>Start Date</label>
+                        <input type="date" name="start_date" class="form-control" value="{{ $startDate->format('Y-m-d') }}">
+                    </div>
+                     <div class="col-md-4">
+                        <label>End Date</label>
+                        <input type="date" name="end_date" class="form-control" value="{{ $endDate->format('Y-m-d') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </form>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header">Detailed Transactions</div>
             <div class="card-body">
                 <table class="table table-bordered table-striped">
-                    <thead>
+                    <thead class="bg-success text-white">
                         <tr>
-                            <th>Time</th>
-                            <th>Description</th>
-                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Note/Description</th>
                             <th class="text-end">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($transactions as $trans)
+                        @forelse($reportData as $row)
                         <tr>
-                            <td>{{ date('h:i A', strtotime($trans['created_at'])) }}</td>
-                            <td>{{ $trans['description'] }}</td>
+                            <td>{{ \Carbon\Carbon::parse($row['date'])->format('d M Y') }}</td>
                             <td>
-                                <span class="badge {{ $trans['type'] == 'Income' || $trans['type'] == 'Withdraw' ? 'bg-success' : 'bg-danger' }}">
-                                    {{ $trans['type'] }}
-                                </span>
+                                @if(isset($row['url']) && $row['url'])
+                                    <a href="{{ $row['url'] }}" target="_blank" class="text-decoration-none fw-bold">
+                                        {{ $row['description'] }} <i class="bi bi-box-arrow-up-right small"></i>
+                                    </a>
+                                @else
+                                    {{ $row['description'] }}
+                                @endif
                             </td>
-                            <td class="text-end">{{ number_format($trans['amount'], 2) }}</td>
+                            <td class="text-end">{{ number_format($row['amount'], 2) }}</td>
                         </tr>
-                        @endforeach
-                        @if(empty($transactions))
-                            <tr><td colspan="4" class="text-center">No transactions found for this date.</td></tr>
-                        @endif
+                        @empty
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No data found for this period.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
+                    <tfoot>
+                        <!-- Spacer Row -->
+                        <tr style="height: 30px; border: none;"><td colspan="3" style="border: none;"></td></tr>
+                        
+                        <!-- Total Income -->
+                        <tr class="bg-warning">
+                            <td colspan="2" class="text-end fw-bold">Total Income (All with paid or unpaid)</td>
+                            <td class="text-end fw-bold">{{ number_format($grandTotalIncome, 2) }}</td>
+                        </tr>
+                        
+                        <!-- Total Expenses -->
+                        <tr class="bg-warning">
+                             <td colspan="2" class="text-end fw-bold">All Total Expenses</td>
+                            <td class="text-end fw-bold">{{ number_format($allTotalExpenses, 2) }}</td>
+                        </tr>
+
+                        <!-- Total Balance -->
+                        <tr class="bg-warning">
+                             <td colspan="2" class="text-end fw-bold">Total Balance Remain In Cash Now</td>
+                            <td class="text-end fw-bold">{{ number_format($totalBalance, 2) }}</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        .card-body { padding: 0 !important; }
+        .bg-success { background-color: #198754 !important; color: white !important; -webkit-print-color-adjust: exact; }
+        .bg-warning { background-color: #ffc107 !important; -webkit-print-color-adjust: exact; }
+    }
+</style>
 @endsection
