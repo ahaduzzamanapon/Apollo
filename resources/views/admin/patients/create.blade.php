@@ -33,7 +33,7 @@
                 <div class="card-header bg-primary text-white">Patient Information</div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label>Report/Entry Date</label>
                             <input type="date" name="report_date" class="form-control" value="{{ date('Y-m-d') }}" required>
                         </div>
@@ -45,9 +45,17 @@
                             <label>Mobile Number</label>
                             <input type="text" name="mobile" class="form-control" required>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label>Age</label>
                             <input type="number" name="age" class="form-control" required>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>Age Unit</label>
+                            <select name="age_unit" class="form-control">
+                                <option value="Years">Years</option>
+                                <option value="Months">Months</option>
+                                <option value="Days">Days</option>
+                            </select>
                         </div>
                         <div class="col-md-2 mb-3">
                             <label>Gender</label>
@@ -57,15 +65,11 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="col-md-2 mb-3">
-                            <label>Date of Birth</label>
-                            <input type="date" name="dob" class="form-control">
-                        </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label>NID (Optional)</label>
                             <input type="text" name="nid" class="form-control">
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label>Reference Doctor</label>
                             <div class="input-group">
                                 <select name="reference_doctor_id" class="form-control search-select">

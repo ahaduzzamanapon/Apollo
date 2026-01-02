@@ -332,8 +332,8 @@
                     <tbody>
                         @foreach($dailyHonorariumList as $item)
                         <tr>
-                            <td>{{ $item->report->referenceDoctor->name ?? 'Self' }}</td>
-                            <td>{{ $item->category->test_name ?? '-' }}</td>
+                            <td>{{ $item->doctor->name ?? '-' }}</td>
+                            <td>{{ $item->test->name ?? '-' }}</td>
                             <td>{{ $item->report->patient->name ?? '-' }}</td>
                             <td class="fw-bold">{{ $item->commission_amount }}</td>
                         </tr>

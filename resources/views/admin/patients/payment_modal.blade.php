@@ -22,6 +22,11 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label">Less Discount (Flat)</label>
+                        <input type="number" name="discount" class="form-control" placeholder="0">
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label">Pay Amount <span class="text-danger">*</span></label>
                         <input type="number" name="amount" class="form-control" required min="1">
                     </div>
