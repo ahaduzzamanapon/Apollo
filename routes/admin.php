@@ -11,7 +11,7 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware('auth:admin')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        
+
         Route::post('menus/order', [\App\Http\Controllers\Admin\MenuController::class, 'updateOrder'])->name('admin.menus.order')->middleware('permission:menus.edit');
         Route::resource('menus', \App\Http\Controllers\Admin\MenuController::class)->names('admin.menus')->middleware('permission:menus.browse');
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('admin.users')->middleware('permission:users.browse');
@@ -40,19 +40,19 @@ Route::prefix('admin')->group(function () {
         Route::resource('reports', \App\Http\Controllers\Admin\ReportCategoryController::class);
         Route::resource('ledgers', \App\Http\Controllers\Admin\AccountsLedgerController::class);
         Route::resource('expenses', \App\Http\Controllers\Admin\ExpenseController::class);
-        
+
         // Bank Management
         Route::post('banks/transaction', [\App\Http\Controllers\Admin\BankController::class, 'storeTransaction'])->name('banks.transaction.store');
         Route::resource('banks', \App\Http\Controllers\Admin\BankController::class);
 
         // Accounts Report
         Route::get('accounts/report', [\App\Http\Controllers\Admin\AccountsReportController::class, 'index'])->name('accounts.report');
-        
+
         Route::get('patients/due', [PatientController::class, 'due'])->name('admin.patients.due');
         Route::post('patients/payment', [PatientController::class, 'addPayment'])->name('admin.patients.payment');
         Route::get('patients/{id}/download-invoice', [PatientController::class, 'downloadInvoice'])->name('patients.download_invoice');
         Route::resource('patients', PatientController::class)->names('admin.patients');
-        
+
         Route::get('commission', [\App\Http\Controllers\Admin\ReportBillingController::class, 'commission'])->name('commission.index');
 
         require base_path('routes/crud.php');
