@@ -3,17 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Patient;
-use App\Models\ReportCategory;
 use App\Models\Doctor;
-use App\Models\PatientReport;
+use App\Models\Patient;
 use App\Models\PatientPayment;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
-
+use App\Models\PatientReport;
+use App\Models\ReportCategory;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PatientController extends Controller
 {
@@ -24,12 +22,12 @@ class PatientController extends Controller
         // Search
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('report_code', 'like', "%{$search}%")
-                  ->orWhereHas('patient', function($p) use ($search) {
-                      $p->where('name', 'like', "%{$search}%")
-                        ->orWhere('mobile', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('patient', function ($p) use ($search) {
+                        $p->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -41,12 +39,12 @@ class PatientController extends Controller
         // Export CSV
         if ($request->has('export') && $request->export == 'true') {
             $reports = $query->latest()->get();
-            $filename = "patient_reports_" . date('Y-m-d_H-i-s') . ".csv";
-            
-            return response()->streamDownload(function() use ($reports) {
+            $filename = 'patient_reports_'.date('Y-m-d_H-i-s').'.csv';
+
+            return response()->streamDownload(function () use ($reports) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, ['Report Code', 'Date', 'Patient Name', 'Mobile', 'Doctor', 'Total Amount', 'Paid Amount', 'Due Amount']);
-                
+
                 foreach ($reports as $report) {
                     fputcsv($file, [
                         $report->report_code,
@@ -56,7 +54,7 @@ class PatientController extends Controller
                         $report->referenceDoctor->name ?? 'Self',
                         $report->final_amount,
                         $report->paid_amount,
-                        $report->due_amount
+                        $report->due_amount,
                     ]);
                 }
                 fclose($file);
@@ -67,7 +65,8 @@ class PatientController extends Controller
         if ($request->has('export') && $request->export == 'pdf') {
             $reports = $query->latest()->get();
             $pdf = Pdf::loadView('admin.patients.pdf', compact('reports'));
-            return $pdf->download('patient_reports_' . date('Y-m-d_H-i-s') . '.pdf');
+
+            return $pdf->download('patient_reports_'.date('Y-m-d_H-i-s').'.pdf');
         }
 
         // Calculate Totals (Clone query to avoid modifying the original builder for pagination)
@@ -87,17 +86,17 @@ class PatientController extends Controller
     public function due(Request $request)
     {
         $query = PatientReport::with(['patient', 'referenceDoctor'])
-                    ->where('due_amount', '>', 0);
+            ->where('due_amount', '>', 0);
 
         // Search
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('report_code', 'like', "%{$search}%")
-                  ->orWhereHas('patient', function($p) use ($search) {
-                      $p->where('name', 'like', "%{$search}%")
-                        ->orWhere('mobile', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('patient', function ($p) use ($search) {
+                        $p->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -106,15 +105,15 @@ class PatientController extends Controller
             $query->whereBetween('report_date', [$request->start_date, $request->end_date]);
         }
 
-         // Export CSV
-         if ($request->has('export') && $request->export == 'true') {
+        // Export CSV
+        if ($request->has('export') && $request->export == 'true') {
             $reports = $query->latest()->get();
-            $filename = "due_list_" . date('Y-m-d_H-i-s') . ".csv";
-            
-            return response()->streamDownload(function() use ($reports) {
+            $filename = 'due_list_'.date('Y-m-d_H-i-s').'.csv';
+
+            return response()->streamDownload(function () use ($reports) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, ['Report Code', 'Date', 'Patient Name', 'Mobile', 'Doctor', 'Total Amount', 'Paid Amount', 'Due Amount']);
-                
+
                 foreach ($reports as $report) {
                     fputcsv($file, [
                         $report->report_code,
@@ -124,7 +123,7 @@ class PatientController extends Controller
                         $report->referenceDoctor->name ?? 'Self',
                         $report->final_amount,
                         $report->paid_amount,
-                        $report->due_amount
+                        $report->due_amount,
                     ]);
                 }
                 fclose($file);
@@ -135,7 +134,8 @@ class PatientController extends Controller
         if ($request->has('export') && $request->export == 'pdf') {
             $reports = $query->latest()->get();
             $pdf = Pdf::loadView('admin.patients.pdf', compact('reports'));
-            return $pdf->download('due_list_' . date('Y-m-d_H-i-s') . '.pdf');
+
+            return $pdf->download('due_list_'.date('Y-m-d_H-i-s').'.pdf');
         }
 
         // Calculate Totals
@@ -156,6 +156,7 @@ class PatientController extends Controller
     {
         $doctors = Doctor::all();
         $categories = ReportCategory::orderBy('category_name')->get();
+
         return view('admin.patients.create', compact('doctors', 'categories'));
     }
 
@@ -165,6 +166,7 @@ class PatientController extends Controller
             'patient_name' => 'required|string',
             'mobile' => 'required|string',
             'age' => 'required|integer',
+            'age_unit' => 'required|in:Years,Months,Days',
             'gender' => 'required|in:Male,Female,Other',
             'report_date' => 'required|date',
             'reference_doctor_id' => 'nullable|exists:doctors,id',
@@ -174,16 +176,24 @@ class PatientController extends Controller
             'paid_amount' => 'nullable|numeric',
         ]);
 
-        // 1. Create or Find Patient (Based on Mobile/NID logic if needed, but for now Create New)
-        // Assuming every entry is a new functional patient visit, but let's try to reuse if mobile matches?
-        // Requirement says "Patient Entry", implies creating a record.
-        
+        // Calculate DOB based on Age & Unit
+        $dob = null;
+        if ($request->age_unit == 'Years') {
+            $dob = Carbon::now()->subYears($request->age);
+        } elseif ($request->age_unit == 'Months') {
+            $dob = Carbon::now()->subMonths($request->age);
+        } elseif ($request->age_unit == 'Days') {
+            $dob = Carbon::now()->subDays($request->age);
+        }
+
+        // 1. Create or Find Patient
         $patient = Patient::create([
             'name' => $request->patient_name,
             'mobile' => $request->mobile,
             'nid' => $request->nid,
             'age' => $request->age,
-            'dob' => $request->dob, // Optional
+            'age_unit' => $request->age_unit,
+            'dob' => $dob,
             'gender' => $request->gender,
         ]);
 
@@ -191,7 +201,7 @@ class PatientController extends Controller
         // Generate Unique ID: ADDC_000001
         $lastReport = PatientReport::latest('id')->first();
         $nextId = $lastReport ? $lastReport->id + 1 : 1;
-        $reportCode = 'ADDC_' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+        $reportCode = 'ADDC_'.str_pad($nextId, 6, '0', STR_PAD_LEFT);
 
         $report = PatientReport::create([
             'report_code' => $reportCode,
@@ -204,12 +214,12 @@ class PatientController extends Controller
 
         // 3. Add Tests & Calculate Totals
         $totalAmount = 0;
-        
+
         // Fetch doctor honorariums
         $doctorHonorariums = [];
-        if($request->reference_doctor_id) {
+        if ($request->reference_doctor_id) {
             $doctor = Doctor::with('honorariums')->find($request->reference_doctor_id);
-            foreach($doctor->honorariums as $honorarium) {
+            foreach ($doctor->honorariums as $honorarium) {
                 $doctorHonorariums[$honorarium->report_category_id] = $honorarium;
             }
         }
@@ -248,7 +258,7 @@ class PatientController extends Controller
         ]);
 
         // 5. Create Payment Record if Paid Amount > 0
-        if(($request->paid_amount ?? 0) > 0) {
+        if (($request->paid_amount ?? 0) > 0) {
             PatientPayment::create([
                 'patient_report_id' => $report->id,
                 'amount' => $request->paid_amount,
@@ -266,28 +276,46 @@ class PatientController extends Controller
         $request->validate([
             'patient_report_id' => 'required|exists:patient_reports,id',
             'amount' => 'required|numeric|min:1',
+            'discount' => 'nullable|numeric|min:0',
             'payment_method' => 'required|string',
             'remarks' => 'nullable|string',
         ]);
 
         $report = PatientReport::findOrFail($request->patient_report_id);
 
-        if($request->amount > $report->due_amount) {
-            return back()->with('error', 'Payment amount cannot exceed due amount!');
+        $paymentAmount = $request->amount;
+        $discountAmount = $request->discount ?? 0;
+        $totalReduction = $paymentAmount + $discountAmount;
+
+        if ($totalReduction > $report->due_amount) {
+            return back()->with('error', 'Payment amount + Discount cannot exceed due amount!');
         }
 
-        // Create Payment Record
+        // Create Payment Record (Store discount here)
         PatientPayment::create([
             'patient_report_id' => $report->id,
-            'amount' => $request->amount,
+            'amount' => $paymentAmount,
+            'discount' => $discountAmount,
             'payment_method' => $request->payment_method,
             'remarks' => $request->remarks,
             'collected_by' => Auth::guard('admin')->id(),
         ]);
 
         // Update Report Totals
-        $report->increment('paid_amount', $request->amount);
-        $report->decrement('due_amount', $request->amount);
+        // 1. Update Paid Amount (Increment by actual money paid)
+        $newPaidTotal = $report->paid_amount + $paymentAmount;
+
+        // 2. Update Due Amount (Decrease by money paid + discount given)
+        $totalReduction = $paymentAmount + $discountAmount;
+        $newDueAmount = max(0, $report->due_amount - $totalReduction);
+
+        // Note: We do NOT update report->discount or report->final_amount as per user request.
+        // The discount on payment is considered a "waiver" or "adjustment" recorded in payment history.
+
+        $report->update([
+            'paid_amount' => $newPaidTotal,
+            'due_amount' => $newDueAmount,
+        ]);
 
         return back()->with('success', 'Payment Received Successfully!');
     }
@@ -295,6 +323,7 @@ class PatientController extends Controller
     public function show($id)
     {
         $report = PatientReport::with(['patient', 'tests.category', 'referenceDoctor'])->findOrFail($id);
+
         return view('admin.patients.show', compact('report'));
     }
 
@@ -303,6 +332,7 @@ class PatientController extends Controller
         $report = PatientReport::with(['patient', 'tests.category', 'referenceDoctor'])->findOrFail($id);
         $pdf = Pdf::loadView('admin.patients.invoice_pdf', compact('report'));
         $pdf->setPaper('a5', 'landscape');
-        return $pdf->download('invoice_' . $report->report_code . '.pdf');
+
+        return $pdf->download('invoice_'.$report->report_code.'.pdf');
     }
 }

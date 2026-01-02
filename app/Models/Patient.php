@@ -11,6 +11,7 @@ class Patient extends Model
         'nid',
         'mobile',
         'age',
+        'age_unit',
         'dob',
         'gender',
     ];

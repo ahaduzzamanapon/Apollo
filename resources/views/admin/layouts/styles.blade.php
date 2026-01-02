@@ -50,6 +50,12 @@
         transition: all 0.2s ease;
         letter-spacing: 0.01em;
     }
+    
+    label {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
 
     .btn-sm {
         padding: 0.375rem 0.75rem;

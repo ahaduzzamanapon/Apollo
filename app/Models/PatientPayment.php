@@ -13,6 +13,7 @@ class PatientPayment extends Model
         'branch_id',
         'patient_report_id',
         'amount',
+        'discount',
         'payment_method',
         'transaction_id',
         'remarks',
