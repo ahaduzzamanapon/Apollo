@@ -13,6 +13,7 @@ class PatientReport extends Model
         'report_code',
         'patient_id',
         'reference_doctor_id',
+        'ref_by_someone',
         'report_date',
         'total_amount',
         'discount',

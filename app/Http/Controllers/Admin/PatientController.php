@@ -207,6 +207,7 @@ class PatientController extends Controller
             'report_code' => $reportCode,
             'patient_id' => $patient->id,
             'reference_doctor_id' => $request->reference_doctor_id,
+            'ref_by_someone' => $request->has('ref_by_someone') ? 1 : 0,
             'report_date' => $request->report_date,
             'discount' => $request->discount ?? 0,
             'paid_amount' => $request->paid_amount ?? 0,
@@ -214,36 +215,69 @@ class PatientController extends Controller
 
         // 3. Add Tests & Calculate Totals
         $totalAmount = 0;
+        $testData = [];
+        $totalRawCommission = 0;
 
         // Fetch doctor honorariums
         $doctorHonorariums = [];
-        if ($request->reference_doctor_id) {
+        if ($request->reference_doctor_id && !$request->has('ref_by_someone')) { // Check ref_by_someone logic too
             $doctor = Doctor::with('honorariums')->find($request->reference_doctor_id);
-            foreach ($doctor->honorariums as $honorarium) {
-                $doctorHonorariums[$honorarium->report_category_id] = $honorarium;
+            if($doctor) {
+                 foreach ($doctor->honorariums as $honorarium) {
+                    $doctorHonorariums[$honorarium->report_category_id] = $honorarium;
+                }
             }
         }
 
+        // Pass 1: Calculate Totals and Raw Commissions
         foreach ($request->tests as $categoryId) {
             $category = ReportCategory::find($categoryId);
+            if(!$category) continue;
+
             $price = $category->price;
             $totalAmount += $price;
 
-            // Calculate Commission
             $commission = 0;
-            if (isset($doctorHonorariums[$categoryId])) {
-                $hon = $doctorHonorariums[$categoryId];
-                if ($hon->amount > 0) {
-                    $commission = $hon->amount;
-                } elseif ($hon->percentage > 0) {
-                    $commission = ($price * $hon->percentage) / 100;
+            // Only calculate commission if NOT ref_by_someone (though handled by empty array above, safety check)
+            if (!$request->has('ref_by_someone')) {
+                if (isset($doctorHonorariums[$categoryId])) {
+                    $hon = $doctorHonorariums[$categoryId];
+                    if ($hon->amount > 0) {
+                        $commission = $hon->amount;
+                    } elseif ($hon->percentage > 0) {
+                        $commission = ($price * $hon->percentage) / 100;
+                    }
                 }
             }
 
-            $report->tests()->create([
-                'report_category_id' => $categoryId,
+            $totalRawCommission += $commission;
+
+            $testData[] = [
+                'category_id' => $categoryId,
                 'price' => $price,
-                'commission_amount' => $commission,
+                'raw_commission' => $commission,
+            ];
+        }
+
+        // Apply Discount Logic to Commission
+        // User Logic: Doctor Commission = Total Commission - Patient Discount
+        // If Discount > Commission, Doctor gets 0.
+        $patientDiscount = $request->discount ?? 0;
+        $netTotalCommission = max(0, $totalRawCommission - $patientDiscount);
+
+        // Calculate adjustment factor to distribute net commission back to tests
+        // Avoid division by zero
+        $commissionFactor = $totalRawCommission > 0 ? ($netTotalCommission / $totalRawCommission) : 0;
+
+        // Pass 2: Create PatientTest Records
+        foreach ($testData as $data) {
+            // Distribute the net commission proportionally
+            $finalCommission = $data['raw_commission'] * $commissionFactor;
+
+            $report->tests()->create([
+                'report_category_id' => $data['category_id'],
+                'price' => $data['price'],
+                'commission_amount' => $finalCommission,
             ]);
         }
 
