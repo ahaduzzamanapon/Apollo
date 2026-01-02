@@ -54,6 +54,7 @@ Route::prefix('admin')->group(function () {
         Route::resource('patients', PatientController::class)->names('admin.patients');
         
         Route::get('commission', [\App\Http\Controllers\Admin\ReportBillingController::class, 'commission'])->name('commission.index');
+        Route::post('commission/approve', [\App\Http\Controllers\Admin\ReportBillingController::class, 'approve'])->name('commission.approve');
 
         require base_path('routes/crud.php');
     });
