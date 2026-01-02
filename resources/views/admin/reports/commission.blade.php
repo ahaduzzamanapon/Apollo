@@ -135,6 +135,9 @@
                                 <i class="bi bi-file-excel"></i> Export Pending CSV
                             </a>
                         @else
+                             <a href="{{ route('commission.index', array_merge(request()->all(), ['export' => 'pdf'])) }}" class="btn btn-outline-danger">
+                                <i class="bi bi-file-pdf"></i> Export PDF
+                            </a>
                              <a href="{{ route('commission.index', array_merge(request()->all(), ['export' => 'csv'])) }}" class="btn btn-outline-success">
                                 <i class="bi bi-file-excel"></i> Export CSV
                             </a>

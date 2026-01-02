@@ -68,6 +68,15 @@ class ReportBillingController extends Controller
             }, $filename);
         }
 
+        // Export PDF
+        if ($request->has('export') && $request->export == 'pdf') {
+            $commissions = $query->latest()->get();
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.reports.commission_pdf', compact('commissions', 'status'));
+            $pdf->setPaper('a4', 'portrait');
+
+            return $pdf->download('commission_report_' . $status . '_' . date('Y-m-d_H-i-s') . '.pdf');
+        }
+
         $commissions = $query->latest()->paginate(20);
         $doctors = Doctor::all();
         
