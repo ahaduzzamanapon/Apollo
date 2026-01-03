@@ -1,18 +1,23 @@
 @extends('admin.layouts.app')
 
 @section('content')
+<style>
+    .table tbody td, .table thead th {
+        padding : 2px;
+    }
+    </style>
 <div class="container">
     <div class="row">
         <div class="col-md-8 offset-md-1">
             <div class="card">
                 <div class="card-body">
                     <div class="text-center mb-4">
-                        <h2>Apollo Digital Diagnostic Center</h2>
-                        <p>Pirgang, Thakurgaon</p>
-                        <h4>Money Receipt</h4>
+                        {{-- @include('admin.reports.center_header')
+                        h4 --}}
+                        <h4 class="border-bottom">Invoice</h4>
                     </div>
-                    
-                    <div class="row mb-4">
+
+                    <div class="row mb-4" style="font-size:12px;border: 1px solid;line-height: 0px;padding-top: 18px;">
                         <div class="col-md-6">
                             <p><strong>Bill No:</strong> {{ $report->report_code }}</p>
                             <p><strong>Date:</strong> {{ $report->report_date }}</p>
@@ -30,63 +35,63 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Test Name</th>
-                                <th class="text-end">Price</th>
+                                <th style="font-size:12px">Test Name</th>
+                                <th style="font-size: 12px" class="text-end">Price</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($report->tests as $test)
                             <tr>
-                                <td>{{ $test->category->test_name }}</td>
-                                <td class="text-end">{{ $test->price }}</td>
+                                <td  style="font-size:11px">{{ $test->category->test_name }}</td>
+                                <td style="font-size:11px" class="text-end">{{ $test->price }}</td>
                             </tr>
                             @endforeach
                             <tr>
-                                <th class="text-end">Total Amount</th>
-                                <th class="text-end">{{ $report->total_amount }}</th>
+                                <th class="text-end" style="font-size:11px">Total Amount</th>
+                                <th class="text-end" style="font-size:11px">{{ $report->total_amount }}</th>
                             </tr>
                              <tr>
-                                <th class="text-end">Discount</th>
-                                <th class="text-end">{{ $report->discount }}</th>
+                                <th class="text-end" style="font-size:11px">Discount</th>
+                                <th class="text-end" style="font-size:11px">{{ $report->discount }}</th>
                             </tr>
                              <tr>
-                                <th class="text-end">Net Payable</th>
-                                <th class="text-end">{{ $report->final_amount }}</th>
+                                <th class="text-end" style="font-size:11px">Net Payable</th>
+                                <th class="text-end" style="font-size:11px">{{ $report->final_amount }}</th>
                             </tr>
                              <tr>
-                                <th class="text-end">Paid Amount</th>
-                                <th class="text-end">{{ $report->paid_amount }}</th>
+                                <th class="text-end" style="font-size:11px">Paid Amount</th>
+                                <th class="text-end" style="font-size:11px">{{ $report->paid_amount }}</th>
                             </tr>
                              <tr>
-                                <th class="text-end">Due Amount</th>
-                                <th class="text-end">{{ $report->due_amount }}</th>
+                                <th class="text-end" style="font-size:11px">Due Amount</th>
+                                <th class="text-end" style="font-size:11px">{{ $report->due_amount }}</th>
                             </tr>
                         </tbody>
                         </tbody>
                     </table>
-                    
+
                     <!-- Payment History -->
                     <h5 class="mt-4 mb-3">Payment History</h5>
-                        <table class="table table-bordered table-sm">
+                    <table class="table table-bordered table-sm">
                         <thead class="bg-light">
                             <tr>
-                                <th>Date</th>
-                                <th>Method</th>
-                                <th>Amount</th>
-                                <th>Discount</th>
-                                <th>Collected By</th>
-                                <th>Remarks</th>
+                                <th style="font-size:12px" class="text-center">Date</th>
+                                <th style="font-size:12px" class="text-center">Method</th>
+                                <th style="font-size:12px" class="text-center">Amount</th>
+                                <th style="font-size:12px" class="text-center">Discount</th>
+                                <th style="font-size:12px" class="text-center">Collected By</th>
+                                <th style="font-size:12px" class="text-center">Remarks</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody >
                             @forelse($report->payments as $payment)
                             <tr>
-                                <td>{{ $payment->created_at->format('Y-m-d h:i A') }}</td>
-                                <td>{{ $payment->payment_method }}</td>
-                                <td class="fw-bold">{{ $payment->amount }}</td>
-                                <td class="text-danger">{{ $payment->discount > 0 ? $payment->discount : '-' }}</td>
-                                <td>{{ $payment->collectedBy->name ?? 'N/A' }}</td>
-                                <td>{{ $payment->remarks }}</td>
+                                <td style="font-size:11px">{{ $payment->created_at->format('Y-m-d h:i A') }}</td>
+                                <td style="font-size:11px">{{ $payment->payment_method }}</td>
+                                <td style="font-size:11px" class="fw-bold">{{ $payment->amount }}</td>
+                                <td style="font-size:11px" class="text-danger">{{ $payment->discount > 0 ? $payment->discount : '-' }}</td>
+                                <td style="font-size:11px">{{ $payment->collectedBy->name ?? 'N/A' }}</td>
+                                <td style="font-size:11px;white-space:pre-line">{{ $payment->remarks }}</td>
                             </tr>
                             @empty
                             <tr>
@@ -95,7 +100,7 @@
                             @endforelse
                         </tbody>
                     </table>
-                    
+
                     <div class="text-center mt-5 no-print">
                         @if($report->due_amount > 0)
                         <button type="button" class="btn btn-success me-2" onclick="openPaymentModal({{ $report->id }}, '{{ $report->report_code }}', {{ $report->due_amount }})">

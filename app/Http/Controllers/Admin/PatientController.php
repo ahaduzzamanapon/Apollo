@@ -12,6 +12,11 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Mpdf\Mpdf;
+use Mpdf\Config\ConfigVariables;
+use Mpdf\Config\FontVariables;
 
 class PatientController extends Controller
 {
@@ -363,10 +368,48 @@ class PatientController extends Controller
 
     public function downloadInvoice($id)
     {
-        $report = PatientReport::with(['patient', 'tests.category', 'referenceDoctor'])->findOrFail($id);
-        $pdf = Pdf::loadView('admin.patients.invoice_pdf', compact('report'));
-        $pdf->setPaper('a5', 'landscape');
+        // $report = PatientReport::with(['patient', 'tests.category', 'referenceDoctor'])->findOrFail($id);
+        // $pdf = Pdf::loadView('admin.patients.invoice_pdf', compact('report'))
+        // ->setPaper('a5', 'portrait');
+        // return $pdf->stream('invoice_'.$report->report_code.'.pdf');
 
-        return $pdf->download('invoice_'.$report->report_code.'.pdf');
+        $report = PatientReport::with(['patient', 'tests.category', 'referenceDoctor'])
+            ->findOrFail($id);
+
+        // mPDF config
+        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+
+        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'default_font' => 'FreeSerif',
+            'fontDir' => array_merge($fontDirs, [
+                public_path('fonts/'),
+            ]),
+            'fontdata' => $fontData + [
+                'kalpurush' => [
+                    'R' => 'Kalpurush.ttf',
+                    'useOTL' => 0xFF,
+                    'useKashida' => 75,
+                ],
+            ],
+            'format' => 'A5',
+            'margin' => 15,
+        ]);
+
+        // Load Blade view (same as DOMPDF)
+        $html = view('admin.patients.invoice_pdf', compact('report'))->render();
+
+        $mpdf->WriteHTML($html);
+
+        // Stream PDF (browser preview)
+      return response(
+        $mpdf->Output('invoice_'.$report->report_code.'.pdf', 'S'))
+             ->header('Content-Type', 'application/pdf')
+             ->header('Content-Disposition', 'attachment; filename="invoice_'.$report->report_code.'.pdf"');
+
     }
 }

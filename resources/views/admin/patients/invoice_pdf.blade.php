@@ -1,49 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Invoice - {{ $report->report_code }}</title>
     <style>
         @page { margin: 15px; }
-        body { font-family: sans-serif; font-size: 11px; margin: 0; padding: 0; }
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('{{ public_path("fonts/Kalpurush.ttf") }}') format('truetype');
+        }
+        body { font-family: "Kalpurush",sans-serif; font-size: 11px; margin: 0; padding: 0; }
         .header { text-align: center; margin-bottom: 10px; }
         .header h2 { margin: 0; font-size: 18px; font-weight: bold; }
         .header p { margin: 2px 0; }
-        .invoice-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        
-        .info-table { width: 100%; margin-bottom: 10px; }
-        .info-table td { padding: 2px; vertical-align: top; }
-        
-        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        .items-table th, .items-table td { border: 1px solid #ddd; padding: 4px; }
-        .items-table th { background-color: #f8f9fa; text-align: left; }
-        .text-end { text-align: right; }
-        
-        .totals-table { width: 45%; margin-left: auto; border-collapse: collapse; }
-        .totals-table th, .totals-table td { border: 1px solid #ddd; padding: 4px; }
-        
-        .footer { width: 100%; text-align: center; font-size: 10px; color: #666; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 5px; }
+        .invoice-title { font-size: 12px; font-weight: bold; margin-bottom: 10px; text-align: center; padding-bottom: 5px;width:10px }
+        .bangla-text {
+            font-family: 'Kalpurush', 'DejaVu Sans', sans-serif;
+            font-size: 10px;
+        }
+        .bangla-vertical {
+            border: 1px solid red;
+            border-radius: 10px;
+            padding: 6px 4px;
+            font-family: 'Kalpurush';
+            font-size: 10px;
+            text-align: center;
+            width: 300px;
+            writing-mode: rl !important;
+            /* position:absolute; */
+            margin: 0 auto;
+
+        }
+        .info-table {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .info-table td {
+            padding: 2px;
+            vertical-align: top;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        .items-table th, .items-table td {
+            border: 1px solid #000000;
+            padding: 4px;
+        }
+        .items-table th {
+            /* background-color: #d6c9c9; */
+            text-align: left;
+            border:1px solid #000000;
+        }
+        .text-end {
+            text-align: right;
+        }
+
+        .totals-table {
+            width: 45%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+        .totals-table th, .totals-table td {
+            border: 1px solid #000000;
+            padding: 4px;
+        }
+
+        .footer {
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            margin-top: 20px;
+            padding-top: 5px;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h2>Apollo Digital Diagnostic Center</h2>
-        <p>Pirgang, Thakurgaon | Mobile: 01712-345678</p> 
-    </div>
+    @include('admin.reports.center_header')
 
     <div class="invoice-title">MONEY RECEIPT</div>
 
-    <table class="info-table">
+    <table class="info-table" style="border: 1px solid black;">
         <tr>
             <td width="55%">
                 <strong>Bill No:</strong> {{ $report->report_code }}<br>
-                <strong>Name:</strong> {{ $report->patient->name }}<br>
-                <strong>Mobile:</strong> {{ $report->patient->mobile }}
+                <strong>Date:</strong> {{ date('d M, Y', strtotime($report->report_date)) }}<br>
+                <strong>Ref:</strong> {{ $report->referenceDoctor->name ?? 'Self' }}<br>
+                <strong>Patient Name:</strong> {{ $report->patient->name }}<br>
             </td>
             <td width="45%" class="text-end">
-                <strong>Date:</strong> {{ date('d M, Y', strtotime($report->report_date)) }}<br>
-                <strong>Age/Gender:</strong> {{ $report->patient->age }}Y / {{ $report->patient->gender }}<br>
-                <strong>Ref:</strong> {{ $report->referenceDoctor->name ?? 'Self' }}
+                <strong>Gender:</strong> {{ $report->patient->gender }}<br>
+                <strong>Age:</strong> {{ $report->patient->age }}Y<br>
+                <strong>Mobile:</strong> {{ $report->patient->mobile }}
             </td>
         </tr>
     </table>
@@ -87,9 +138,11 @@
             <td class="text-end">{{ number_format($report->due_amount, 0) }}</td>
         </tr>
     </table>
-    
+    <br>
+    <p class="bangla-text" style="text-align: center;">রিপোর্ট সংগ্রহের শেষ সময় রাত ১১.০০,"রিপোর্ট নেয়ার সময় রিসিটে থাকা মোবাইল নাম্বারের মোবাইলটি এবং রিসিট অবশ্যই সাথে আনতে হবে"</p>
+    <p class="bangla-text bangla-vertical" > ডেলিভারী তারিখ হতে ৩০ দিনের মধ্যে রিপোর্ট সংগ্রহ করা যাবে</p>
     <div class="footer">
-        Computer Generated Invoice. Printed: {{ date('d M, Y h:i A') }}
+        <p style="border-top: 1px solid #1e4981;">Computer Generated Invoice. Printed: {{ date('d M, Y h:i A') }}</p>
     </div>
 </body>
 </html>
