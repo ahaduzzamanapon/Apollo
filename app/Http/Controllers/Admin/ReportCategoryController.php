@@ -4,19 +4,45 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ReportCategory;
+use App\Models\TestCategory;
 use Illuminate\Http\Request;
 
 class ReportCategoryController extends Controller
 {
     public function index()
     {
-        $categories = ReportCategory::latest()->paginate(10);
-        return view('admin.reports.index', compact('categories'));
+        $categories = TestCategory::with(['tests' => function ($query) {
+            $query->orderBy('id', 'desc');
+        }])->orderBy('id')->get();
+
+        $categoriesArr = [];
+
+        foreach ($categories as $category) {
+            $categoriesArr[$category->category_name] = [
+                'id' => $category->id,
+                'tests' => $category->tests // collection, empty if none
+            ];
+        }
+
+        return view('admin.reports.index', ['categories' => $categoriesArr]);
     }
 
-    public function create()
+
+    public function create(Request $request)
     {
-        return view('admin.reports.create');
+        $category = null;
+
+        if ($request->filled('category_id')) {
+            $category = ReportCategory::find($request->category_id);
+
+            if (!$category) {
+                return redirect()
+                    ->route('reports.index')
+                    ->with('error', 'Category not found!');
+            }
+        }
+
+        return view('admin.reports.create', compact('category'));
     }
 
     public function store(Request $request)
@@ -35,8 +61,9 @@ class ReportCategoryController extends Controller
 
     public function edit(ReportCategory $report)
     {
-        // Route param is 'report' but model is ReportCategory
-        return view('admin.reports.edit', compact('report'));
+        $category = TestCategory::find($report->category_name);
+
+        return view('admin.reports.edit', compact('report', 'category'));
     }
 
     public function update(Request $request, ReportCategory $report)

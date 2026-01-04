@@ -20,4 +20,8 @@ class ReportCategory extends Model
     {
         return $this->hasMany(DoctorHonorarium::class);
     }
+    public function category()
+    {
+        return $this->belongsTo(TestCategory::class, 'category_name', 'id');
+    }
 }

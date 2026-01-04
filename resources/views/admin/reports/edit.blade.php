@@ -11,14 +11,8 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label>Category Name</label>
-                        <input type="text" name="category_name" class="form-control" list="categories" value="{{ $report->category_name }}" required>
-                        <datalist id="categories">
-                            <option value="Haematology">
-                            <option value="Immunology">
-                            <option value="Biochemistry">
-                            <option value="Urine">
-                            <option value="Hormone Analysis">
-                        </datalist>
+                        <input type="text" class="form-control" value="{{ $category->category_name }}" readonly disabled>
+                        <input type="hidden" name="category_name" value="{{ $category->id }}">
                     </div>
                     <div class="mb-3">
                         <label>Test Name</label>
