@@ -407,7 +407,7 @@ class PatientController extends Controller
 
         // Stream PDF (browser preview)
       return response(
-        $mpdf->Output('invoice_'.$report->report_code.'.pdf', 'S'))
+        $mpdf->Output('invoice_'.$report->report_code.'.pdf', 'I'))
              ->header('Content-Type', 'application/pdf')
              ->header('Content-Disposition', 'attachment; filename="invoice_'.$report->report_code.'.pdf"');
 

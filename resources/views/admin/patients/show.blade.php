@@ -17,19 +17,21 @@
                         <h4 class="border-bottom">Invoice</h4>
                     </div>
 
-                    <div class="row mb-4" style="font-size:12px;border: 1px solid;line-height: 0px;padding-top: 18px;">
+                    <div class="row mb-4" style="font-size:12px;border: 1px solid;line-height: 0px;padding-top: 25px;height:auto">
                         <div class="col-md-6">
                             <p><strong>Bill No:</strong> {{ $report->report_code }}</p>
                             <p><strong>Date:</strong> {{ $report->report_date }}</p>
-                            <p><strong>Ref. Doctor:</strong> {{ $report->referenceDoctor->name ?? 'Self' }}</p>
                             <p><strong>Patient Name:</strong> {{ $report->patient->name }}</p>
                         </div>
                         <div class="col-md-6 text-end">
-
+                            
                             <p><strong>Gender:</strong>  {{ $report->patient->gender }}</p>
                             <p><strong>Age:</strong> {{ $report->patient->age }} {{ $report->patient->age_unit }}</p>
                             <p><strong>Mobile:</strong> {{ $report->patient->mobile }}</p>
                         </div>
+                        <div class="col-md-12" style="margin-top:-10px">
+                            <p style="line-height: 18px"><strong>Ref. Doctor: DR.</strong> {{ $report->referenceDoctor->name ?? 'Self' }}</p>
+                        </div>    
                     </div>
 
                     <table class="table table-bordered">
