@@ -11,3 +11,9 @@ Route::get('centerDetails/export/excel', [App\Http\Controllers\Admin\CenterDetai
 Route::resource('testCategories', App\Http\Controllers\Admin\TestCategoryController::class)->names('admin.testCategories');
 Route::get('testCategories/export/pdf', [App\Http\Controllers\Admin\TestCategoryController::class, 'exportPdf'])->name('admin.testCategories.export.pdf');
 Route::get('testCategories/export/excel', [App\Http\Controllers\Admin\TestCategoryController::class, 'exportExcel'])->name('admin.testCategories.export.excel');
+
+Route::resource('testFields', App\Http\Controllers\Admin\TestFieldController::class)->names('admin.testFields');
+Route::get('testFields/export/pdf', [App\Http\Controllers\Admin\TestFieldController::class, 'exportPdf'])->name('admin.testFields.export.pdf');
+Route::get('testFields/export/excel', [App\Http\Controllers\Admin\TestFieldController::class, 'exportExcel'])->name('admin.testFields.export.excel');
+Route::get('testFields/by-test/{test}', [App\Http\Controllers\Admin\TestFieldController::class, 'byTest'])->name('admin.testFields.byTest');
+
