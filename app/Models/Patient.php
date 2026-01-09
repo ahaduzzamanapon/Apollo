@@ -20,4 +20,6 @@ class Patient extends Model
     {
         return $this->hasMany(PatientReport::class);
     }
+
+
 }

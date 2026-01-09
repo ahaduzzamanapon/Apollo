@@ -30,7 +30,7 @@
                             <td>
                                 @foreach($doctor->honorariums as $hon)
                                     <span class="badge bg-info">
-                                        {{ $hon->reportCategory->test_name }}: 
+                                        {{ $hon->reportCategory->test_name }}:
                                         {{ $hon->amount > 0 ? $hon->amount . ' TK' : $hon->percentage . '%' }}
                                     </span><br>
                                 @endforeach

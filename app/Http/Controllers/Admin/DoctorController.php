@@ -17,11 +17,13 @@ class DoctorController extends Controller
 
     public function create()
     {
-        $reportCategories = ReportCategory::all();
         $latestDoctor = Doctor::with('honorariums')->latest()->first();
-        
-        return view('admin.doctors.create', compact('reportCategories', 'latestDoctor'));
+        $tests = ReportCategory::with('category')
+            ->get()
+            ->groupBy(fn ($item) => $item->category->category_name ?? 'Uncategorized');
+        return view('admin.doctors.create', compact('tests', 'latestDoctor'));
     }
+
 
     public function store(Request $request)
     {
@@ -53,10 +55,17 @@ class DoctorController extends Controller
 
     public function edit(Doctor $doctor)
     {
-        $reportCategories = ReportCategory::all();
         $doctor->load('honorariums');
-        return view('admin.doctors.edit', compact('doctor', 'reportCategories'));
+
+        $tests = ReportCategory::with('category')
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->category->category_name ?? 'Uncategorized';
+            });
+
+        return view('admin.doctors.edit', compact('doctor', 'tests'));
     }
+
 
     public function update(Request $request, Doctor $doctor)
     {

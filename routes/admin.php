@@ -56,6 +56,9 @@ Route::prefix('admin')->group(function () {
         Route::get('commission', [\App\Http\Controllers\Admin\ReportBillingController::class, 'commission'])->name('commission.index');
         Route::post('commission/approve', [\App\Http\Controllers\Admin\ReportBillingController::class, 'approve'])->name('commission.approve');
 
+        // test entry route
+        Route::get('test-entry-form',[\App\Http\Controllers\TestEntryForm::class,'index'])->name('admin.test_entry_form.index');
+        Route::get('patient-test-entry/{id}',[\App\Http\Controllers\TestEntryForm::class,'patientTestEntry'])->name('admin.patients.test_entry');
         require base_path('routes/crud.php');
     });
 });
