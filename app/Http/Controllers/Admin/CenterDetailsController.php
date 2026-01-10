@@ -90,26 +90,40 @@ class CenterDetailsController extends Controller
     public function update(Request $request, $id)
     {
         $item = CenterDetails::findOrFail($id);
+
+        // Validation
         $data = $request->validate([
-            'name_bn' => 'required',
-            'name_en' => 'required',
-            'about' => 'required',
-            'address' => 'required',
-            'phone' => 'required',
-            'logo_image' => 'required',
+            'name_bn'  => 'required|string',
+            'name_en'  => 'required|string',
+            'about'    => 'required|string',
+            'address'  => 'required|string',
+            'phone'    => 'required|string',
+            'logo_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $data = $request->except(['_token', '_method', 'logo_image']);
+        // If new image is uploaded
         if ($request->hasFile('logo_image')) {
-            if ($item->logo_image) {
+
+            // Delete old image if exists
+            if ($item->logo_image && Storage::disk('public')->exists($item->logo_image)) {
                 Storage::disk('public')->delete($item->logo_image);
             }
-            $data['logo_image'] = $request->file('logo_image')->store('centerDetails', 'public');
+
+            // Store new image
+            $data['logo_image'] = $request->file('logo_image')
+                ->store('centerDetails', 'public');
+        } else {
+            // Keep old image
+            unset($data['logo_image']);
         }
 
         $item->update($data);
-        return redirect()->route('admin.centerDetails.index')->with('success', 'CenterDetails updated successfully.');
+
+        return redirect()
+            ->route('admin.centerDetails.index')
+            ->with('success', 'CenterDetails updated successfully.');
     }
+
 
     public function destroy($id)
     {

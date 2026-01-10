@@ -24,14 +24,14 @@
                             <p><strong>Patient Name:</strong> {{ $report->patient->name }}</p>
                         </div>
                         <div class="col-md-6 text-end">
-                            
+
                             <p><strong>Gender:</strong>  {{ $report->patient->gender }}</p>
                             <p><strong>Age:</strong> {{ $report->patient->age }} {{ $report->patient->age_unit }}</p>
                             <p><strong>Mobile:</strong> {{ $report->patient->mobile }}</p>
                         </div>
                         <div class="col-md-12" style="margin-top:-10px">
                             <p style="line-height: 18px"><strong>Ref. Doctor: DR.</strong> {{ $report->referenceDoctor->name ?? 'Self' }}</p>
-                        </div>    
+                        </div>
                     </div>
 
                     <table class="table table-bordered">

@@ -20,8 +20,8 @@ class TestEntryForm extends Controller
 
     public function patientTestEntry($id)
     {
-        $patient = Patient::find($id);
-        // dd($patient);
-        return view('admin.patients.test_entry.patient_test_entry', compact('patient'));
+        $patients = Patient::with('tests')->where('id', $id)->get();
+        // dd($patients);
+        return view('admin.patients.test_entry.patient_test_entry', compact('patients'));
     }
 }

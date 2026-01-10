@@ -9,11 +9,28 @@
                 <div class="card-body">
                     <h5>Patient Info</h5>
                     <table class="table table-borderless" style="border:none">
+                        @foreach($patients as $row)
                         <tr>
-                            <td style='vertical-align:middle'>Name: {{ $patient->name }}</td>
-                            <td style='vertical-align:middle'>Age: {{ $patient->age }}</td>
-                            <td style='vertical-align:middle'>Phone: {{ $patient->mobile }}</td>
+                            <td>Name:  {{ $row->name }}</td>
+                            <td>Age: {{ $row->age }}</td>
+                            <td>Phone: {{ $row->mobile }}</td>
                         </tr>
+                        @endforeach
+                    </table>
+
+                    <table class="table table-borderless" style="border:none">
+                        <tr>
+                            <th>Test Category</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                        @foreach($patients as $row)
+                        @foreach($row->category as $test)
+                        <tr>
+                            <td>{{ $test->category->test_name }}</td>
+                            <td class="text-end">{{ number_format($test->price, 0) }}</td>
+                        </tr>
+                        @endforeach
+                        @endforeach
                     </table>
                 </div>
             </div>

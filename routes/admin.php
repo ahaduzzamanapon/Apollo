@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PatientController;
+use Illuminate\Support\Facades\Artisan;
 Route::prefix('admin')->group(function () {
     Route::get('login', [AuthController::class, 'login'])->name('admin.login');
     Route::post('login', [AuthController::class, 'loginPost'])->name('admin.login.post');
@@ -59,6 +60,27 @@ Route::prefix('admin')->group(function () {
         // test entry route
         Route::get('test-entry-form',[\App\Http\Controllers\TestEntryForm::class,'index'])->name('admin.test_entry_form.index');
         Route::get('patient-test-entry/{id}',[\App\Http\Controllers\TestEntryForm::class,'patientTestEntry'])->name('admin.patients.test_entry');
+        Route::get('/reset-storage-link', function () {
+
+            $link = public_path('storage');
+            $target = storage_path('app/public');
+
+            // Remove existing storage link or folder
+            if (File::exists($link)) {
+                if (is_link($link)) {
+                    unlink($link); // remove symlink
+                } else {
+                    File::deleteDirectory($link); // if folder exists
+                }
+            }
+
+            // Create new storage link
+            Artisan::call('storage:link');
+            Artisan::call('optimize:clear');
+            Artisan::call('dompdf:publish');
+
+            return 'Storage link reset and optimize cache cleared successfully';
+        });
         require base_path('routes/crud.php');
     });
 });

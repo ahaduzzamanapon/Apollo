@@ -23,7 +23,6 @@ class ReportCategoryController extends Controller
                 'tests' => $category->tests // collection, empty if none
             ];
         }
-
         return view('admin.reports.index', ['categories' => $categoriesArr]);
     }
 

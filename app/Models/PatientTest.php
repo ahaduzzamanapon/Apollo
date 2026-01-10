@@ -25,4 +25,9 @@ class PatientTest extends Model
     {
         return $this->belongsTo(ReportCategory::class, 'report_category_id');
     }
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class,'id');
+    }
 }

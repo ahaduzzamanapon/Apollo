@@ -22,6 +22,9 @@ class ReportCategory extends Model
     }
     public function category()
     {
-        return $this->belongsTo(TestCategory::class, 'category_name', 'id');
+        return $this->belongsTo(TestCategory::class, 'id');
+    }
+    public function tests(){
+        return $this->hasMany(PatientTest::class,'report_category_id');
     }
 }

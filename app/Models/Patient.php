@@ -21,5 +21,10 @@ class Patient extends Model
         return $this->hasMany(PatientReport::class);
     }
 
+    public function tests()
+    {
+        return $this->hasMany(PatientTest::class,'patient_report_id');
+    }
+
 
 }

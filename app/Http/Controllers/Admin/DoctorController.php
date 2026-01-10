@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Doctor;
+use App\Models\TestCategory;
 use App\Models\ReportCategory;
 use Illuminate\Http\Request;
 
@@ -18,9 +19,20 @@ class DoctorController extends Controller
     public function create()
     {
         $latestDoctor = Doctor::with('honorariums')->latest()->first();
-        $tests = ReportCategory::with('category')
-            ->get()
-            ->groupBy(fn ($item) => $item->category->category_name ?? 'Uncategorized');
+        $categories = TestCategory::with(['tests' => function ($query) {
+            $query->orderBy('id', 'desc');
+        }])->orderBy('id')->get();
+
+        $categoriesArr = [];
+
+        foreach ($categories as $category) {
+            $categoriesArr[$category->category_name] = [
+                'id' => $category->id,
+                'tests' => $category->tests // collection, empty if none
+            ];
+        }
+
+        $tests = $categoriesArr;
         return view('admin.doctors.create', compact('tests', 'latestDoctor'));
     }
 
@@ -57,11 +69,20 @@ class DoctorController extends Controller
     {
         $doctor->load('honorariums');
 
-        $tests = ReportCategory::with('category')
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->category->category_name ?? 'Uncategorized';
-            });
+        $categories = TestCategory::with(['tests' => function ($query) {
+            $query->orderBy('id', 'desc');
+        }])->orderBy('id')->get();
+
+        $categoriesArr = [];
+
+        foreach ($categories as $category) {
+            $categoriesArr[$category->category_name] = [
+                'id' => $category->id,
+                'tests' => $category->tests // collection, empty if none
+            ];
+        }
+
+        $tests = $categoriesArr;
 
         return view('admin.doctors.edit', compact('doctor', 'tests'));
     }
