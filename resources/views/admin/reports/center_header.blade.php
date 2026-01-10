@@ -1,8 +1,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <style>
     @font-face {
-        font-family: 'Kalpurush';
-        src: url('{{ public_path("fonts/Kalpurush.ttf") }}') format('truetype');
+        font-family: 'kalpurush';
+        src: url('{{ public_path("fonts/kalpurush.ttf") }}') format('truetype');
         font-weight: normal;
         font-style: normal;
     }
@@ -22,7 +22,7 @@
     }
 
     .bn {
-        font-family: 'Kalpurush', sans-serif;
+        font-family: 'kalpurush', sans-serif;
         align-items: center;
 
     }

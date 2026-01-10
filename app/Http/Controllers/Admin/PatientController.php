@@ -391,7 +391,7 @@ class PatientController extends Controller
             ]),
             'fontdata' => $fontData + [
                 'kalpurush' => [
-                    'R' => 'Kalpurush.ttf',
+                    'R' => 'kalpurush.ttf',
                     'useOTL' => 0xFF,
                     'useKashida' => 75,
                 ],

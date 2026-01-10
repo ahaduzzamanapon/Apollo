@@ -10,12 +10,12 @@
         }
 
         @font-face {
-            font-family: 'Kalpurush';
-            src: url('{{ public_path("fonts/Kalpurush.ttf") }}') format('truetype');
+            font-family: 'kalpurush';
+            src: url('{{ public_path("fonts/kalpurush.ttf") }}') format('truetype');
         }
 
         body {
-            font-family: 'Kalpurush', sans-serif;
+            font-family: 'kalpurush', sans-serif;
             font-size: 11px;
             margin: 0;
             padding: 0;
@@ -86,7 +86,7 @@
         }
 
         .bangla-text {
-            font-family: 'Kalpurush';
+            font-family: 'kalpurush';
             font-size: 11px;
         }
 
