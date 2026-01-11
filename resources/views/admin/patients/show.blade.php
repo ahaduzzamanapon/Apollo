@@ -110,7 +110,7 @@
                         </button>
                         @endif
                         <a href="{{ route('patients.download_invoice', $report->id) }}" class="btn btn-sm btn-danger me-2"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
-                        <a href="{{ route('patients.print_invoice', $report->id) }}" class="btn btn-sm btn-danger me-2"><i class="bi bi-file-earmark-print"></i> Print Invoice</a>
+                        <a href="{{ route('patients.print_invoice', $report->id) }}" target="_blank" class="btn btn-sm btn-danger me-2"><i class="bi bi-file-earmark-print"></i> Print Invoice</a>
                         <a href="{{ route('admin.patients.index') }}" class="btn btn-sm btn-secondary">Back to List</a>
                     </div>
                 </div>

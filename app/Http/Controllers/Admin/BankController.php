@@ -16,6 +16,8 @@ class BankController extends Controller
         $total_deposit = 0;
         $total_withdraw = 0;
         $balance = 0;
+        $filtered_deposit = 0;
+        $filtered_withdraw = 0;
         $transactions = collect();
 
         // Filters
