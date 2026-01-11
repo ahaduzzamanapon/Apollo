@@ -16,7 +16,7 @@
 
     @font-face {
         font-family: 'kalpurush';
-        src: url('{{ public_path("fonts/kalpurush.ttf") }}') format('truetype');
+        src: url('{{ asset("fonts/kalpurush.ttf") }}') format('truetype');
     }
 
     body {
