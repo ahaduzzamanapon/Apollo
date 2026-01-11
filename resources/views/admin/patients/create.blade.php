@@ -27,7 +27,7 @@
         </div>
         <form action="{{ route('admin.patients.store') }}" method="POST">
             @csrf
-            
+
             <!-- Patient Info -->
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">Patient Information</div>
@@ -117,7 +117,7 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Test Name</th>
+                                <th style="width:35px">Test Name</th>
                                 <th>Price</th>
                                 <th>Action</th>
                             </tr>
@@ -148,7 +148,7 @@
                                 <th colspan="2" class="text-end">Paid Amount</th>
                                 <th>
                                     <input type="number" name="paid_amount" id="paidAmount" class="form-control mb-2" value="0" oninput="calculateTotal()">
-                                    
+
                                     <div class="d-flex gap-2">
                                         <select name="payment_method" class="form-control form-control-sm">
                                             <option value="Cash">Cash</option>
@@ -202,7 +202,7 @@
             }
         });
 
-        
+
         // Also initialize other selects if needed, e.g. doctor reference
         $('.search-select').select2({
             placeholder: "Select Doctor",
@@ -217,7 +217,7 @@
         const select = document.getElementById('testSelect');
         const id = select.value;
         if(!id) return;
-        
+
         const option = select.options[select.selectedIndex];
         const name = option.getAttribute('data-name');
         const price = parseFloat(option.getAttribute('data-price'));
@@ -241,12 +241,12 @@
 
         total += price;
         updateCalculations();
-        
+
         $('#testSelect').val(null).trigger('change'); // Reset Select2 for next input
     }
-    
+
     // ... (rest of functions: removeTest, updateCalculations, calculateTotal) ...
-   
+
     function removeTest(id, price) {
         document.getElementById('row-'+id).remove();
         total -= price;
@@ -262,14 +262,14 @@
         let flatDiscount = parseFloat(document.getElementById('discountFlat').value) || 0;
         let percentDiscount = parseFloat(document.getElementById('discountPercent').value) || 0;
         let paid = parseFloat(document.getElementById('paidAmount').value) || 0;
-        
+
         let totalDiscount = flatDiscount + ((total * percentDiscount) / 100);
 
         // Prevent discount from exceeding total
         if(totalDiscount > total) {
              totalDiscount = total;
         }
-        
+
         // Update hidden input used for submission
         document.getElementById('finalDiscount').value = Math.round(totalDiscount);
 
