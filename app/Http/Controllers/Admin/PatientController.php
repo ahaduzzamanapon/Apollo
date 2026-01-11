@@ -31,8 +31,10 @@ class PatientController extends Controller
                 $q->where('report_code', 'like', "%{$search}%")
                     ->orWhereHas('patient', function ($p) use ($search) {
                         $p->where('name', 'like', "%{$search}%")
-                            ->orWhere('mobile', 'like', "%{$search}%")
                             ->orWhere('mobile', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('referenceDoctor', function ($d) use ($search) {
+                        $d->where('name', 'like', "%{$search}%");
                     });
             });
         }
@@ -102,6 +104,9 @@ class PatientController extends Controller
                     ->orWhereHas('patient', function ($p) use ($search) {
                         $p->where('name', 'like', "%{$search}%")
                             ->orWhere('mobile', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('referenceDoctor', function ($d) use ($search) {
+                        $d->where('name', 'like', "%{$search}%");
                     });
             });
         }

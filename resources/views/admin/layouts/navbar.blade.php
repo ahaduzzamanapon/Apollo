@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg border-bottom px-3 py-2" style="background-color: var(--navbar-bg); color: var(--navbar-text-color);">
+<nav class="navbar navbar-expand-lg border-bottom px-3 py-2" style="background-color: var(--navbar-bg); color: var(--navbar-text-color); position: relative; z-index: 9999;">
     <div class="d-flex align-items-center">
         <button class="btn btn-primary me-3" id="sidebarToggle">
             <i class="bi bi-list"></i>
