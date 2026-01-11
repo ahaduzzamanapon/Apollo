@@ -31,6 +31,7 @@ class PatientController extends Controller
                 $q->where('report_code', 'like', "%{$search}%")
                     ->orWhereHas('patient', function ($p) use ($search) {
                         $p->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%")
                             ->orWhere('mobile', 'like', "%{$search}%");
                     });
             });
