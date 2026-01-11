@@ -59,14 +59,17 @@ class ExpenseController extends Controller
             return $pdf->download('expenses_' . date('Y-m-d_H-i-s') . '.pdf');
         }
 
+        // Calculate Total Amount
+        $total_amount = (clone $query)->sum('amount');
+
         $expenses = $query->latest()->paginate(20);
         
         if ($request->ajax()) {
-            return view('admin.expenses.table_body', compact('expenses'))->render();
+            return view('admin.expenses.table_body', compact('expenses', 'total_amount'))->render();
         }
 
         $ledgers = AccountsLedger::where('type', 'Expense')->get();
-        return view('admin.expenses.index', compact('expenses', 'ledgers'));
+        return view('admin.expenses.index', compact('expenses', 'ledgers', 'total_amount'));
     }
 
     public function store(Request $request)

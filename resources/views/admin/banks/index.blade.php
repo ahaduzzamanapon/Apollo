@@ -11,27 +11,48 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <!-- Bank Selection -->
+        <!-- Bank Selection & Filters -->
         <div class="card mb-4">
             <div class="card-body">
-                <form action="{{ route('banks.index') }}" method="GET" id="bankSelectForm">
-                    <div class="row align-items-center">
-                        <div class="col-md-4">
-                            <label class="fw-bold mb-1">Select Bank Account:</label>
-                            <select name="bank_id" class="form-control select2" onchange="document.getElementById('bankSelectForm').submit()">
-                                @foreach($banks as $bank)
-                                    <option value="{{ $bank->id }}" {{ $activeBank && $activeBank->id == $bank->id ? 'selected' : '' }}>
-                                        {{ $bank->name }} ({{ $bank->account_no }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="d-block mb-1">&nbsp;</label>
-                            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#addBankModal">
-                                <i class="bi bi-plus-circle"></i> Add New Bank
-                            </button>
-                        </div>
+                <form action="{{ route('banks.index') }}" method="GET" id="bankFilterForm" class="row align-items-end">
+                    <!-- Bank Select -->
+                    <div class="col-md-3">
+                        <label class="fw-bold mb-1">Bank Account</label>
+                        <select name="bank_id" class="form-control select2" onchange="document.getElementById('bankFilterForm').submit()">
+                            @foreach($banks as $bank)
+                                <option value="{{ $bank->id }}" {{ $activeBank && $activeBank->id == $bank->id ? 'selected' : '' }}>
+                                    {{ $bank->name }} ({{ $bank->account_no }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Type Filter -->
+                    <div class="col-md-2">
+                        <label class="fw-bold mb-1">Type</label>
+                        <select name="trans_type" class="form-control" onchange="document.getElementById('bankFilterForm').submit()">
+                            <option value="All" {{ $type == 'All' ? 'selected' : '' }}>All Types</option>
+                            <option value="Deposit" {{ $type == 'Deposit' ? 'selected' : '' }}>Deposit only</option>
+                            <option value="Withdraw" {{ $type == 'Withdraw' ? 'selected' : '' }}>Withdraw only</option>
+                        </select>
+                    </div>
+
+                    <!-- Date Range -->
+                    <div class="col-md-2">
+                        <label class="fw-bold mb-1">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" value="{{ $startDate }}" onchange="document.getElementById('bankFilterForm').submit()">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="fw-bold mb-1">End Date</label>
+                        <input type="date" name="end_date" class="form-control" value="{{ $endDate }}" onchange="document.getElementById('bankFilterForm').submit()">
+                    </div>
+
+                    <!-- Add Button -->
+                    <div class="col-md-3">
+                         <label class="d-block mb-1">&nbsp;</label>
+                        <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#addBankModal">
+                            <i class="bi bi-plus-circle"></i> Add New Bank
+                        </button>
                     </div>
                 </form>
             </div>
@@ -110,6 +131,16 @@
                                     </tr>
                                 @endforelse
                             </tbody>
+                            <tfoot>
+                                <tr class="table-dark">
+                                    <td colspan="2" class="text-end fw-bold">Total (Filtered):</td>
+                                    <td colspan="3" class="fw-bold">
+                                         <span class="text-success">Dep: {{ number_format($filtered_deposit, 2) }}</span>
+                                         <span class="mx-2">|</span>
+                                         <span class="text-danger">With: {{ number_format($filtered_withdraw, 2) }}</span>
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

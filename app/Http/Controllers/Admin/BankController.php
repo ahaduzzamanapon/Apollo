@@ -18,6 +18,11 @@ class BankController extends Controller
         $balance = 0;
         $transactions = collect();
 
+        // Filters
+        $startDate = $request->start_date ?? date('Y-m-d');
+        $endDate = $request->end_date ?? date('Y-m-d');
+        $type = $request->trans_type ?? 'All';
+
         if ($request->has('bank_id')) {
             $activeBank = $banks->firstWhere('id', $request->bank_id);
         } else {
@@ -25,19 +30,36 @@ class BankController extends Controller
         }
 
         if ($activeBank) {
-            // Load transactions for calculations
-            // Optimization: We could do this with aggregates if list is huge, but for now loading relations is fine
-            $activeBank->load(['transactions' => function($q) {
-                $q->orderBy('trans_date', 'desc')->orderBy('id', 'desc');
-            }]);
-
-            $total_deposit = $activeBank->transactions->where('trans_type', 'Deposit')->sum('amount');
-            $total_withdraw = $activeBank->transactions->where('trans_type', 'Withdraw')->sum('amount');
+            // 1. Calculate Overall Balance (Life Time) - Not affected by Date Filters
+            // using a fresh query to avoid loading all records if possible, but load() is already used on $activeBank model instance from collection.
+            // Since we are iterating all banks, they are already loaded. 
+            // Better to run a direct query for totals if we want efficiency, but sticking to existing pattern for consistency unless it's huge.
+            // Actually, $banks = Bank::all() loads everything. $activeBank is one of them.
+            // To be safe and correct with "Life Time" vs "Filtered", we should query specifically.
+            
+            $lifeTimeTrans = BankTransaction::where('bank_id', $activeBank->id)->get();
+            $total_deposit = $lifeTimeTrans->where('trans_type', 'Deposit')->sum('amount');
+            $total_withdraw = $lifeTimeTrans->where('trans_type', 'Withdraw')->sum('amount');
             $balance = $total_deposit - $total_withdraw;
-            $transactions = $activeBank->transactions;
+
+            // 2. Fetch Filtered Transactions for List
+            $transQuery = $activeBank->transactions()->whereBetween('trans_date', [$startDate, $endDate]);
+
+            if ($type != 'All') {
+                $transQuery->where('trans_type', $type);
+            }
+
+            $transactions = $transQuery->orderBy('trans_date', 'desc')->orderBy('id', 'desc')->get();
+            
+            // Calculate totals for the filtered list
+            $filtered_deposit = $transactions->where('trans_type', 'Deposit')->sum('amount');
+            $filtered_withdraw = $transactions->where('trans_type', 'Withdraw')->sum('amount');
         }
 
-        return view('admin.banks.index', compact('banks', 'activeBank', 'total_deposit', 'total_withdraw', 'balance', 'transactions'));
+        return view('admin.banks.index', compact(
+            'banks', 'activeBank', 'total_deposit', 'total_withdraw', 'balance', 'transactions', 
+            'startDate', 'endDate', 'type', 'filtered_deposit', 'filtered_withdraw'
+        ));
     }
 
     public function store(Request $request)
