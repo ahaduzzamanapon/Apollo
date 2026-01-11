@@ -47,16 +47,36 @@
                         <input type="date" name="end_date" class="form-control" value="{{ $endDate }}" onchange="document.getElementById('bankFilterForm').submit()">
                     </div>
 
-                    <!-- Add Button -->
+                    <!-- Actions -->
                     <div class="col-md-3">
                          <label class="d-block mb-1">&nbsp;</label>
-                        <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#addBankModal">
-                            <i class="bi bi-plus-circle"></i> Add New Bank
-                        </button>
+                         <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-success flex-fill" onclick="exportData('csv')" title="CSV"><i class="bi bi-file-earmark-spreadsheet"></i></button>
+                            <button type="button" class="btn btn-danger flex-fill" onclick="exportData('pdf')" title="PDF"><i class="bi bi-file-earmark-pdf"></i></button>
+                            <button type="button" class="btn btn-primary flex-fill" data-bs-toggle="modal" data-bs-target="#addBankModal" title="Add Bank">
+                                <i class="bi bi-plus-circle"></i>
+                            </button>
+                         </div>
                     </div>
                 </form>
             </div>
         </div>
+
+<script>
+    function exportData(type) {
+        let form = document.getElementById('bankFilterForm');
+        let originalAction = form.action;
+        let url = new URL(originalAction);
+        
+        // Append current params
+        new FormData(form).forEach((value, key) => {
+            url.searchParams.append(key, value);
+        });
+        url.searchParams.append('export', type);
+        
+        window.location.href = url.toString();
+    }
+</script>
 
         @if($activeBank)
             <!-- Bank Details -->
