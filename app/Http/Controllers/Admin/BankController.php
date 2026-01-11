@@ -49,6 +49,38 @@ class BankController extends Controller
                 $transQuery->where('trans_type', $type);
             }
 
+            // Export CSV
+            if ($request->has('export') && $request->export == 'csv') {
+                $filename = "bank_transactions_" . date('Y-m-d_H-i-s') . ".csv";
+                $transactions = $transQuery->orderBy('trans_date', 'desc')->get();
+                
+                return response()->streamDownload(function() use ($transactions, $activeBank) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, ['Bank: ' . $activeBank->name, 'Account: ' . $activeBank->account_no]);
+                    fputcsv($file, ['Date', 'Type', 'Amount', 'Description']);
+                    
+                    foreach ($transactions as $trans) {
+                        fputcsv($file, [
+                            $trans->trans_date,
+                            $trans->trans_type,
+                            $trans->amount,
+                            $trans->note
+                        ]);
+                    }
+                    fclose($file);
+                }, $filename);
+            }
+
+            // Export PDF
+            if ($request->has('export') && $request->export == 'pdf') {
+                $transactions = $transQuery->orderBy('trans_date', 'desc')->get();
+                $filtered_deposit = $transactions->where('trans_type', 'Deposit')->sum('amount');
+                $filtered_withdraw = $transactions->where('trans_type', 'Withdraw')->sum('amount');
+
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.banks.pdf', compact('activeBank', 'transactions', 'startDate', 'endDate', 'filtered_deposit', 'filtered_withdraw'));
+                return $pdf->download('bank_transactions_' . date('Y-m-d_H-i-s') . '.pdf');
+            }
+
             $transactions = $transQuery->orderBy('trans_date', 'desc')->orderBy('id', 'desc')->get();
             
             // Calculate totals for the filtered list
