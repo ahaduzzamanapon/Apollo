@@ -118,10 +118,43 @@
 
 <!-- ================= HEADER (ALL PAGES) ================= -->
 <div class="header">
+    @php
+        $center = \App\Models\CenterDetails::first();
+        $logoBase64 = null;
+        if ($center && $center->logo_image) {
+            $logoPath = public_path('storage/' . $center->logo_image);
+            if (file_exists($logoPath)) {
+                $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+                $data = file_get_contents($logoPath);
+                $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            }
+        }
+    @endphp
 
-    @include('admin.reports.center_header')
+    <table width="100%" style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 5px;">
+        <tr>
+            <!-- Logo Column -->
+            <td width="20%" style="vertical-align: top; text-align: left;">
+                @if($logoBase64)
+                    <img src="{{ $logoBase64 }}" style="height: 60px; width: auto;">
+                @endif
+            </td>
+            
+            <!-- Info Column -->
+            <td width="80%" style="text-align: center; vertical-align: middle;">
+                <div style="font-size: 10px; color: #1e4981;">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার অনুমোদিত</div>
+                <div style="font-size: 18px; font-weight: bold; color: #1e4981; font-family: 'kalpurush', sans-serif;">{{ $center->name_bn }}</div>
+                <div style="font-size: 18px; font-weight: bold; color: #c0392b; text-transform: uppercase;">{{ $center->name_en }}</div>
+                <div style="font-size: 10px; color: #0a7c3a;">{{ $center->about }}</div>
+                <div style="font-size: 9px; margin-top: 2px;">{{ $center->address }} | Mobile: {{ $center->phone }}</div>
+            </td>
+        </tr>
+    </table>
+    
+    <div class="invoice-title" style="text-align: center; font-size: 12px; font-weight: bold; margin-top: 2px; text-decoration: underline;">MONEY RECEIPT</div>
 </div>
-<div class="invoice-title" style="padding-bottom: 5px;padding-top:5px;text-align: center">MONEY RECEIPT</div>
+<!-- Space for Header -->
+<div style="height: 25mm;"></div>
 
 <!-- ================= FOOTER (ALL PAGES) ================= -->
 <div class="footer">
@@ -144,7 +177,7 @@
 </div>
 
 <!-- ================= PATIENT INFO (FIRST PAGE ONLY) ================= -->
-<table class="info-table" style="border:1px solid #000; margin-bottom:10px;">
+<table class="info-table" style="border:1px solid #000; margin-bottom:5px;">
     <tr>
         <td width="55%">
             <strong>Bill No:</strong> {{ $report->report_code }}<br>
