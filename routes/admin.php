@@ -52,6 +52,7 @@ Route::prefix('admin')->group(function () {
         Route::get('patients/due', [PatientController::class, 'due'])->name('admin.patients.due');
         Route::post('patients/payment', [PatientController::class, 'addPayment'])->name('admin.patients.payment');
         Route::get('patients/{id}/download-invoice', [PatientController::class, 'downloadInvoice'])->name('patients.download_invoice');
+        Route::get('patients/{id}/print-invoice', [PatientController::class, 'printInvoice'])->name('patients.print_invoice');
         Route::resource('patients', PatientController::class)->names('admin.patients');
 
         Route::get('commission', [\App\Http\Controllers\Admin\ReportBillingController::class, 'commission'])->name('commission.index');
@@ -62,22 +63,22 @@ Route::prefix('admin')->group(function () {
         Route::get('patient-test-entry/{id}',[\App\Http\Controllers\TestEntryForm::class,'patientTestEntry'])->name('admin.patients.test_entry');
         Route::get('/reset-storage-link', function () {
 
-            $link = public_path('storage');
-            $target = storage_path('app/public');
+            // $link = public_path('storage');
+            // $target = storage_path('app/public');
 
             // Remove existing storage link or folder
-            if (File::exists($link)) {
-                if (is_link($link)) {
-                    unlink($link); // remove symlink
-                } else {
-                    File::deleteDirectory($link); // if folder exists
-                }
-            }
+            // if (File::exists($link)) {
+            //     if (is_link($link)) {
+            //         unlink($link); // remove symlink
+            //     } else {
+            //         File::deleteDirectory($link); // if folder exists
+            //     }
+            // }
 
             // Create new storage link
-            Artisan::call('storage:link');
+            // Artisan::call('storage:link');
             Artisan::call('optimize:clear');
-            Artisan::call('dompdf:publish');
+            // Artisan::call('dompdf:publish');
 
             return 'Storage link reset and optimize cache cleared successfully';
         });

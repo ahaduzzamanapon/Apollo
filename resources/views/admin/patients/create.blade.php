@@ -117,7 +117,7 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th style="width:35px">Test Name</th>
+                                <th style="width:35pc">Test Name</th>
                                 <th>Price</th>
                                 <th>Action</th>
                             </tr>
