@@ -24,10 +24,10 @@ class AppServiceProvider extends ServiceProvider
             $view->with('menus', \App\Models\Menu::whereNull('parent_id')->with('children')->orderBy('order')->get());
         });
         View::composer(
-        [
-            'admin.*',
-            // 'admin.invoice_pdf',
-        ],
+            [
+                'admin.*',
+                // 'admin.invoice_pdf',
+            ],
             function ($view) {
                 $view->with(
                     'center',
@@ -36,8 +36,8 @@ class AppServiceProvider extends ServiceProvider
             }
         );
 
-        if (config('app.env') !== 'local') {
-            \URL::forceScheme('https');
+        if ($this->app->environment('production') || request()->getHost() == 'apollopirganj.com') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
         }
     }
 }
