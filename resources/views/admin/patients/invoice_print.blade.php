@@ -26,9 +26,9 @@
     .text-end { text-align: right; }
     .invoice-title { font-size: 11px; font-weight: bold; margin: 6px 0; }
     table { width: 100%; border-collapse: collapse; }
-    
+
     .info-table td { font-size: 9px; padding: 2px 3px; }
-    
+
     .items-table th, .items-table td {
         border: 1px solid #000;
         padding: 3px;
@@ -60,7 +60,7 @@
         }
         body { margin: 0; padding: 0; }
         .main-page { width: 100%; }
-        
+
         .header {
             position: fixed;
             top: 0;
@@ -78,7 +78,7 @@
             font-size: 8px;
             line-height: 1.2;
         }
-        
+
         .page-break { page-break-before: always; }
     }
 
@@ -97,7 +97,7 @@
             width: 148mm;
             min-height: 210mm;
             /* Simulate Print Margins using Padding */
-            padding: 12mm 8mm 18mm 8mm; 
+            padding: 12mm 8mm 18mm 8mm;
             margin: 0 auto;
             position: relative;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
@@ -121,7 +121,7 @@
             font-size: 8px;
             line-height: 1.2;
         } */
-        
+
         .page-break {
             border-bottom: 2px dashed #999;
             margin: 20px 0;
@@ -165,7 +165,7 @@
                         <img src="{{ $logoBase64 }}" style="height: 60px; width: auto;">
                     @endif
                 </td>
-                
+
                 <!-- Info Column -->
                 <td width="80%" style="text-align: center; vertical-align: middle;">
                     <div style="font-size: 10px; color: #1e4981;">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার অনুমোদিত</div>
@@ -176,9 +176,9 @@
                 </td>
             </tr>
         </table>
-        
+
         <div class="invoice-title" style="text-align: center; font-size: 12px; font-weight: bold; margin-top: 2px; text-decoration: underline;">MONEY RECEIPT</div>
-    </div> 
+    </div>
 
     <!-- Space for Header -->
     <div style="height: 25mm;"></div>

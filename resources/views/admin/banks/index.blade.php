@@ -67,13 +67,13 @@
         let form = document.getElementById('bankFilterForm');
         let originalAction = form.action;
         let url = new URL(originalAction);
-        
+
         // Append current params
         new FormData(form).forEach((value, key) => {
             url.searchParams.append(key, value);
         });
         url.searchParams.append('export', type);
-        
+
         window.location.href = url.toString();
     }
 </script>
