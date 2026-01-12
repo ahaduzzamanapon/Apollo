@@ -13,6 +13,11 @@
     </td>
 </tr>
 @endforeach
+<tr class="fw-bold table-active">
+    <td colspan="3" class="text-end">Total</td>
+    <td>{{ number_format($total_amount, 2) }}</td>
+    <td></td>
+</tr>
 <tr>
     <td colspan="5">
         {{ $expenses->links('pagination::bootstrap-5') }}

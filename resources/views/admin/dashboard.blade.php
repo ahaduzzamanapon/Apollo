@@ -244,6 +244,106 @@
     </div>
 </div>
 
+<!-- CHARTS SECTION -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0 text-secondary"><i class="bi bi-graph-up"></i> Income vs Expense (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="financeChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+             <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0 text-secondary"><i class="bi bi-people"></i> Patient Trend</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="patientChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Finance Chart
+    const ctxFinance = document.getElementById('financeChart').getContext('2d');
+    new Chart(ctxFinance, {
+        type: 'bar',
+        data: {
+            labels: @json($chartLabels),
+            datasets: [
+                {
+                    label: 'Income',
+                    data: @json($chartIncome),
+                    backgroundColor: 'rgba(12, 235, 235, 0.6)', // Teal
+                    borderColor: 'rgba(12, 235, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Expense',
+                    data: @json($chartExpense),
+                    backgroundColor: 'rgba(235, 51, 73, 0.6)', // Red
+                    borderColor: 'rgba(235, 51, 73, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Patient Chart
+    const ctxPatient = document.getElementById('patientChart').getContext('2d');
+    new Chart(ctxPatient, {
+        type: 'line',
+        data: {
+            labels: @json($chartLabels),
+            datasets: [{
+                label: 'New Patients',
+                data: @json($chartPatients),
+                backgroundColor: 'rgba(142, 45, 226, 0.2)', // Purple
+                borderColor: 'rgba(142, 45, 226, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+</script>
+@endpush
+
+<style>
+    /* Fix Nav Dropdown Z-Index */
+    /* Ensure the navbar (which is outside this view, but we can target classes) lies above */
+    .navbar {
+        position: relative;
+        z-index: 1050 !important; /* Higher than card z-index */
+    }
+    
+    /* Ensure Modal is above everything */
+    .modal {
+        z-index: 1060 !important;
+    }
+    .modal-backdrop {
+        z-index: 1055 !important;
+    }
+</style>
 <!-- MODALS -->
 
 <!-- 1. Due Modal -->

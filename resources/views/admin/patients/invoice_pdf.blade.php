@@ -134,7 +134,7 @@
         <td width="55%">
             <strong>Bill No:</strong> {{ $report->report_code }}<br>
             <strong>Date:</strong> {{ date('d M, Y', strtotime($report->report_date)) }}<br>
-            <strong>Patient:</strong> {{ $report->patient->name }}
+            <strong>Patient Name:</strong> {{ $report->patient->name }}
         </td>
         <td width="45%" class="text-end">
             <strong>Gender:</strong> {{ $report->patient->gender }}<br>
@@ -144,7 +144,7 @@
     </tr>
     <tr>
         <td colspan="2">
-            <strong>Ref:</strong> DR. {{ $report->referenceDoctor->name ?? 'Self' }}
+            <strong>Ref. Doctor Name: DR.</strong>  {{ $report->referenceDoctor->name ?? 'Self' }}
         </td>
     </tr>
 </table>

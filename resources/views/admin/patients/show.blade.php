@@ -105,12 +105,13 @@
 
                     <div class="text-center mt-5 no-print">
                         @if($report->due_amount > 0)
-                        <button type="button" class="btn btn-success me-2" onclick="openPaymentModal({{ $report->id }}, '{{ $report->report_code }}', {{ $report->due_amount }})">
+                        <button type="button" class="btn btn-sm btn-success me-2" onclick="openPaymentModal({{ $report->id }}, '{{ $report->report_code }}', {{ $report->due_amount }})">
                             <i class="bi bi-cash"></i> Make Payment
                         </button>
                         @endif
-                        <a href="{{ route('patients.download_invoice', $report->id) }}" class="btn btn-danger me-2"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
-                        <a href="{{ route('admin.patients.index') }}" class="btn btn-secondary">Back to List</a>
+                        <a href="{{ route('patients.download_invoice', $report->id) }}" class="btn btn-sm btn-danger me-2"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
+                        <a href="{{ route('patients.print_invoice', $report->id) }}" target="_blank" class="btn btn-sm btn-danger me-2"><i class="bi bi-printer"></i> Print Invoice</a>
+                        <a href="{{ route('admin.patients.index') }}" class="btn btn-sm btn-secondary"><i class="bi bi-arrow-left"></i> Back to List</a>
                     </div>
                 </div>
             </div>

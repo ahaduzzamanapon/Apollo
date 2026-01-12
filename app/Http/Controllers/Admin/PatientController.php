@@ -32,6 +32,9 @@ class PatientController extends Controller
                     ->orWhereHas('patient', function ($p) use ($search) {
                         $p->where('name', 'like', "%{$search}%")
                             ->orWhere('mobile', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('referenceDoctor', function ($d) use ($search) {
+                        $d->where('name', 'like', "%{$search}%");
                     });
             });
         }
@@ -101,6 +104,9 @@ class PatientController extends Controller
                     ->orWhereHas('patient', function ($p) use ($search) {
                         $p->where('name', 'like', "%{$search}%")
                             ->orWhere('mobile', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('referenceDoctor', function ($d) use ($search) {
+                        $d->where('name', 'like', "%{$search}%");
                     });
             });
         }
@@ -407,9 +413,18 @@ class PatientController extends Controller
 
         // Stream PDF (browser preview)
       return response(
-        $mpdf->Output('invoice_'.$report->report_code.'.pdf', 'I'))
+        $mpdf->Output('invoice_'.$report->report_code.'.pdf', 'S'))
              ->header('Content-Type', 'application/pdf')
              ->header('Content-Disposition', 'attachment; filename="invoice_'.$report->report_code.'.pdf"');
 
     }
+    public function printInvoice($id)
+    {
+        $report = PatientReport::with(['patient','tests.category','referenceDoctor'])
+            ->findOrFail($id);
+
+        return view('admin.patients.invoice_print', compact('report'));
+    }
+
+
 }

@@ -11,7 +11,7 @@
 
     <div class="card card-fixed shadow-sm border-0">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-gray-800 fw-bold">CenterDetails List</h5>
+            <h5 class="mb-0 text-gray-800 fw-bold">Center Details List</h5>
             <div class="d-flex align-items-center">
             <div class="d-flex gap-2">                <input type="text" id="searchInput" name="search" class="form-control form-control-sm" placeholder="Search..." value="{{ request('search') }}">            </div>
             <div class="btn-group btn-group-sm ms-2">                <a href="{{ route('admin.centerDetails.export.pdf') }}" class="btn btn-outline-danger"><i class="bi bi-file-pdf"></i> PDF</a>                <a href="{{ route('admin.centerDetails.export.excel') }}" class="btn btn-outline-success"><i class="bi bi-file-excel"></i> Excel</a>            </div>

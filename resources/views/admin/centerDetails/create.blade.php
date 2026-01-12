@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-gray-800 fw-bold">Create CenterDetails</h5>
+            <h5 class="mb-0 text-gray-800 fw-bold">Create Center Details</h5>
             <a href="{{ route('admin.centerDetails.index') }}" class="btn btn-secondary btn-sm">
                 <i class="bi bi-arrow-left me-1"></i> Back
             </a>

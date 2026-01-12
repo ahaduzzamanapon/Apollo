@@ -54,6 +54,43 @@ class DashboardController extends Controller
         $todayPatients = $todayPatientsQuery->count();
         $todayPatientList = $todayPatientsQuery->get();
 
+        // 8. Charts Data (Last 7 Days)
+        $endDate = Carbon::today();
+        $startDate = Carbon::today()->subDays(6);
+        $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
+
+        $chartLabels = [];
+        $chartIncome = [];
+        $chartExpense = [];
+        $chartPatients = [];
+
+        // Pre-fetch data for the range to avoid N+1 queries in loop
+        $incomeData = PatientPayment::whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->selectRaw('DATE(created_at) as date, SUM(amount) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $expenseData = Expense::whereDate('date', '>=', $startDate)
+            ->whereDate('date', '<=', $endDate)
+            ->selectRaw('DATE(date) as date, SUM(amount) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $patientData = Patient::whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        foreach ($period as $date) {
+            $day = $date->format('Y-m-d');
+            $chartLabels[] = $date->format('d M');
+            $chartIncome[] = $incomeData[$day] ?? 0;
+            $chartExpense[] = $expenseData[$day] ?? 0;
+            $chartPatients[] = $patientData[$day] ?? 0;
+        }
+
         return view('admin.dashboard', compact(
             'todayDue', 'todayDueList',
             'todayReports', 'todayReportList',
@@ -61,7 +98,8 @@ class DashboardController extends Controller
             'totalDailyHonorarium', 'dailyHonorariumList',
             'todayExpense', 'todayExpenseList',
             'todayIncome', 'todayIncomeList',
-            'todayPatients', 'todayPatientList'
+            'todayPatients', 'todayPatientList',
+            'chartLabels', 'chartIncome', 'chartExpense', 'chartPatients'
         ));
     }
 }
