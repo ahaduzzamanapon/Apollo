@@ -1,6 +1,13 @@
 @foreach($menus as $menu)
     <li class="nav-item">
-        <a href="{{ $menu->route ? route($menu->route) : '#' }}" 
+        @php
+            try {
+                $href = $menu->route ? route($menu->route) : '#';
+            } catch (\Exception $e) {
+                $href = '#';
+            }
+        @endphp
+        <a href="{{ $href }}" 
            class="nav-link {{ $menu->isActive() ? 'active' : '' }} d-flex justify-content-between align-items-center"
            @if($menu->children->count() > 0) 
                 data-bs-toggle="collapse" 

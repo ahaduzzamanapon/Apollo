@@ -4,52 +4,50 @@
 <div class="row">
     <div class="col-md-12">
         <h2 class="mb-4">Doctors</h2>
-        <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary mb-3">Add New Doctor</a>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary">Add New Doctor</a>
+            <input type="text" id="course_search" class="form-control w-25" placeholder="Search Doctors...">
+        </div>
         <div class="card">
-            <div class="card-body">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Mobile</th>
-                            <th>Email</th>
-                            <th>Address</th>
-                            <th>Commission Settings</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($doctors as $doctor)
-                        <tr>
-                            <td>{{ $doctor->id }}</td>
-                            <td>{{ $doctor->name }}</td>
-                            <td>{{ $doctor->mobile }}</td>
-                            <td>{{ $doctor->email }}</td>
-                            <td>{{ $doctor->address }}</td>
-                            <td>
-                                @foreach($doctor->honorariums as $hon)
-                                    <span class="badge bg-info">
-                                        {{ $hon->reportCategory->test_name }}:
-                                        {{ $hon->amount > 0 ? $hon->amount . ' TK' : $hon->percentage . '%' }}
-                                    </span><br>
-                                @endforeach
-                            </td>
-                            <td>
-                                <a href="{{ route('admin.doctors.edit', $doctor->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form action="{{ route('admin.doctors.destroy', $doctor->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                {{ $doctors->links() }}
+            <div class="card-body" id="doctors-table-container">
+                @include('admin.doctors.table_rows')
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Search functionality
+        $('#course_search').on('keyup', function() {
+            var query = $(this).val();
+            fetchDoctors(query, 1);
+        });
+
+        // Pagination functionality
+        $(document).on('click', '.pagination a', function(event) {
+            event.preventDefault();
+            var url = $(this).attr('href');
+            var page = new URL(url).searchParams.get('page');
+            var query = $('#course_search').val();
+            fetchDoctors(query, page);
+        });
+
+        function fetchDoctors(query, page) {
+            $.ajax({
+                url: "{{ route('admin.doctors.index') }}",
+                method: 'GET',
+                data: {
+                    search: query,
+                    page: page
+                },
+                success: function(data) {
+                    $('#doctors-table-container').html(data);
+                }
+            });
+        }
+    });
+</script>
 @endsection
+

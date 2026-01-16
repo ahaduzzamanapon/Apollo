@@ -32,7 +32,7 @@ class ReportCategoryController extends Controller
         $category = null;
 
         if ($request->filled('category_id')) {
-            $category = ReportCategory::find($request->category_id);
+            $category = TestCategory::find($request->category_id);
 
             if (!$category) {
                 return redirect()

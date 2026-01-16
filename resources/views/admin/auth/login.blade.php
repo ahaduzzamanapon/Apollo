@@ -81,7 +81,7 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
         }
-
+        
         /* Mobile specific adjustments */
         @media (max-width: 768px) {
             .login-image-side {
@@ -172,7 +172,7 @@
                     <button type="submit" class="btn btn-primary btn-login w-100 mb-4">
                         Sign In <i class="bi bi-arrow-right ms-2"></i>
                     </button>
-
+                    
                     <div class="text-center text-muted small">
                         &copy; {{ date('Y') }} {{ $center->name_en }}. All rights reserved.
                     </div>

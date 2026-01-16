@@ -61,6 +61,9 @@ Route::prefix('admin')->group(function () {
         // test entry route
         Route::get('test-entry-form',[\App\Http\Controllers\TestEntryForm::class,'index'])->name('admin.test_entry_form.index');
         Route::get('patient-test-entry/{id}',[\App\Http\Controllers\TestEntryForm::class,'patientTestEntry'])->name('admin.patients.test_entry');
+        Route::post('patient-test-entry/store',[\App\Http\Controllers\TestEntryForm::class,'store'])->name('patient.test.store');
+        Route::get('patient-test-entry/print/{id}',[\App\Http\Controllers\TestEntryForm::class,'print'])->name('patient.test.print');
+        Route::get('patient-test-entry/pdf/{id}',[\App\Http\Controllers\TestEntryForm::class,'exportPdf'])->name('patient.test.pdf');
         Route::get('/reset-storage-link', function () {
 
             // $link = public_path('storage');

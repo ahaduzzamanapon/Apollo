@@ -10,9 +10,24 @@ use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $doctors = Doctor::with('honorariums')->latest()->paginate(10);
+        $search = $request->input('search');
+
+        $doctors = Doctor::with('honorariums')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        if ($request->ajax()) {
+            return view('admin.doctors.table_rows', compact('doctors'))->render();
+        }
+
         return view('admin.doctors.index', compact('doctors'));
     }
 

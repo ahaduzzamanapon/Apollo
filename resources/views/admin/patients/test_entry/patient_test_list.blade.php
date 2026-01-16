@@ -34,8 +34,16 @@
                                     <td>{{ $test->patient->name }}</td>
                                     <td>{{ $test->patient->age }}</td>
                                     <td>{{ $test->patient->mobile }}</td>
-                                    <td>
-                                        <a href="{{ route('admin.patients.test_entry', $test->id) }}" class="btn btn-primary btn-sm">Test Entry</a>
+                                    <td class="text-nowrap">
+                                        <a href="{{ route('admin.patients.test_entry', $test->id) }}" class="btn btn-primary btn-sm" title="Entry/View">
+                                            <i class="fas fa-edit"></i> Entry
+                                        </a>
+                                        <a href="{{ route('patient.test.print', $test->id) }}" target="_blank" class="btn btn-success btn-sm" title="Print">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                        <a href="{{ route('patient.test.pdf', $test->id) }}" class="btn btn-danger btn-sm" title="PDF">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
