@@ -24,12 +24,14 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>Patient Test List</h5>
                     <div>
-                        <a href="{{ route('patient.test.print', $reportId) }}" target="_blank" class="btn btn-success btn-sm">
-                            <i class="fas fa-print"></i> Print
-                        </a>
-                        <a href="{{ route('patient.test.pdf', $reportId) }}" class="btn btn-danger btn-sm">
-                            <i class="fas fa-file-pdf"></i> PDF
-                        </a>
+                        @if($reportModel->isComplete())
+                            <a href="{{ route('patient.test.print', $reportId) }}" target="_blank" class="btn btn-success btn-sm">
+                                <i class="fas fa-print"></i> Print
+                            </a>
+                            <a href="{{ route('patient.test.pdf', $reportId) }}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </a>
+                        @endif
                     </div>
                 </div>
 

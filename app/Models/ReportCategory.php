@@ -27,4 +27,8 @@ class ReportCategory extends Model
     public function tests(){
         return $this->hasMany(PatientTest::class,'report_category_id');
     }
+    public function fields()
+    {
+        return $this->hasMany(TestField::class, 'test_id');
+    }
 }

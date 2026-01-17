@@ -30,4 +30,9 @@ class PatientTest extends Model
     {
         return $this->belongsTo(Patient::class,'id');
     }
+
+    public function result()
+    {
+        return $this->hasOne(PatientTestResult::class, 'test_id');
+    }
 }

@@ -7,13 +7,12 @@ use App\Models\PatientReport;
 use App\Models\Patient;
 use App\Models\PatientTest;
 use App\Models\Doctor;
-use App\Models\Test;
 
 class TestEntryForm extends Controller
 {
     public function index(Request $request)
     {
-        $query = PatientReport::with('tests', 'patient', 'referenceDoctor');
+        $query = PatientReport::with('tests.category.fields', 'tests.result', 'patient', 'referenceDoctor');
 
         // Search
         if ($request->has('search') && $request->search != '') {
@@ -115,8 +114,10 @@ class TestEntryForm extends Controller
             ->get()
             ->keyBy('test_id');
 
+        $reportModel = PatientReport::with('tests.category.fields', 'tests.result')->find($id);
         $reportId = $id;
-        return compact('patients', 'savedResults', 'reportId');
+
+        return compact('patients', 'savedResults', 'reportId', 'reportModel');
     }
 
     public function store(Request $request)
