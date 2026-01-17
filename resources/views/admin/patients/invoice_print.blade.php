@@ -11,7 +11,7 @@
     <style>
     @page {
         size: A5 portrait;
-        margin: 12mm 8mm 18mm 8mm;
+        margin: 2mm 8mm 0mm 8mm;
     }
 
     @font-face {
@@ -45,7 +45,7 @@
     /* ================= FOOTER ================= */
     .footer {
         position: fixed;
-        bottom: -10mm;
+        bottom: 0mm;
         left: 0;
         right: 0;
         text-align: center;
