@@ -166,7 +166,7 @@ class PatientController extends Controller
     public function create()
     {
         $doctors = Doctor::orderBy('name', 'asc')->get();
-        $categories = ReportCategory::orderBy('category_name')->get();
+        $categories = ReportCategory::orderBy('test_name', 'asc')->get();
 
         return view('admin.patients.create', compact('doctors', 'categories'));
     }

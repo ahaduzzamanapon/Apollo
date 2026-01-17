@@ -12,7 +12,7 @@ class ReportCategoryController extends Controller
     public function index()
     {
         $categories = TestCategory::with(['tests' => function ($query) {
-            $query->orderBy('id', 'desc');
+            $query->orderBy('test_name', 'asc');
         }])->orderBy('id')->get();
 
         $categoriesArr = [];

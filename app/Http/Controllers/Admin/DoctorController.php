@@ -36,7 +36,7 @@ class DoctorController extends Controller
     {
         $latestDoctor = Doctor::with('honorariums')->latest()->first();
         $categories = TestCategory::with(['tests' => function ($query) {
-            $query->orderBy('id', 'desc');
+            $query->orderBy('test_name', 'asc');
         }])->orderBy('id')->get();
 
         $categoriesArr = [];
@@ -86,7 +86,7 @@ class DoctorController extends Controller
         $doctor->load('honorariums');
 
         $categories = TestCategory::with(['tests' => function ($query) {
-            $query->orderBy('id', 'desc');
+            $query->orderBy('test_name', 'asc');
         }])->orderBy('id')->get();
 
         $categoriesArr = [];
