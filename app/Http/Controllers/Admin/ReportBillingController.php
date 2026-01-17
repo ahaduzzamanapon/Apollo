@@ -78,7 +78,7 @@ class ReportBillingController extends Controller
         }
 
         $commissions = $query->latest()->paginate(20);
-        $doctors = Doctor::all();
+        $doctors = Doctor::orderBy('name', 'asc')->get();
         
         // Calculate Totals for footer
         $totalCommission = $commissions->sum('commission_amount'); 

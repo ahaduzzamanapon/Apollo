@@ -11,10 +11,28 @@ use App\Models\Test;
 
 class TestEntryForm extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $patients = PatientReport::with('tests','patient','referenceDoctor')->get();
-        // dd($patients[1]->tests);
+        $query = PatientReport::with('tests', 'patient', 'referenceDoctor');
+
+        // Search
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('report_code', 'like', "%{$search}%")
+                    ->orWhereHas('patient', function ($p) use ($search) {
+                        $p->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $patients = $query->latest()->paginate(20);
+
+        if ($request->ajax()) {
+            return view('admin.patients.test_entry.table_body', compact('patients'))->render();
+        }
+
         return view('admin.patients.test_entry.patient_test_list', compact('patients'));
     }
 

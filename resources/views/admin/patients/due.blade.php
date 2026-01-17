@@ -25,7 +25,8 @@
                         <input type="date" id="endDate" class="form-control" placeholder="End Date" onchange="filterData()">
                     </div>
                     <div class="col-md-3 d-flex gap-2">
-                         <button class="btn btn-secondary w-100" onclick="resetFilters()">Reset</button>
+                        <button class="btn btn-primary w-100" onclick="filterData()">Search</button>
+                        <button class="btn btn-secondary w-100" onclick="resetFilters()">Reset</button>
                     </div>
                     <div class="col-md-2 d-flex gap-1">
                         <button class="btn btn-danger w-100" onclick="exportData('pdf')" title="PDF"><i class="bi bi-file-earmark-pdf"></i></button>

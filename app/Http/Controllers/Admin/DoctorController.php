@@ -21,7 +21,7 @@ class DoctorController extends Controller
                     ->orWhere('mobile', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             })
-            ->latest()
+            ->orderBy('name', 'asc')
             ->paginate($perPage)
             ->withQueryString();
 
