@@ -13,6 +13,7 @@ class DoctorController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $perPage = $request->input('per_page', 10);
 
         $doctors = Doctor::with('honorariums')
             ->when($search, function ($query, $search) {
@@ -21,7 +22,7 @@ class DoctorController extends Controller
                     ->orWhere('email', 'like', "%{$search}%");
             })
             ->latest()
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         if ($request->ajax()) {
