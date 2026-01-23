@@ -414,12 +414,7 @@ class PatientController extends Controller
                 ],
             ],
             'format' => 'A5',
-            'margin_left' => 15,
-            'margin_right' => 15,
-            'margin_top' => 15,
-            'margin_bottom' => 15,
-            'autoScriptToLang' => true,
-            'autoLangToFont' => true,
+            'margin' => 15,
         ]);
 
         // Load Blade view (same as DOMPDF)

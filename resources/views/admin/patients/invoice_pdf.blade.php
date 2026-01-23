@@ -163,8 +163,8 @@
         {{ $center->address }} মোবাইলঃ {{ $center->phone }}
     </p>
 
-    <p>
-        Computer Generated Invoice |
+    <p style="font-size: 14px;">
+        Prepared By: {{ auth()->user()->name }} |
         Printed: {{ date('d M, Y h:i A') }}
     </p>
 </div>

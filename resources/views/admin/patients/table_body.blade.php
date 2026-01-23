@@ -1,7 +1,7 @@
 @foreach($reports as $report)
 <tr>
     <td>
-        <strong>{{ $report->daily_id ?? $report->id }}</strong><br>
+        <!-- <strong>{{ $report->daily_id ?? $report->id }}</strong><br> -->
         <small class="text-muted">{{ $report->report_code }}</small>
     </td>
     <td>{{ date('d M, Y', strtotime($report->report_date)) }}</td>

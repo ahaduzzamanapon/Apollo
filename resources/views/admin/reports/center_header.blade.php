@@ -1,9 +1,93 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<style>
+    @font-face {
+        font-family: 'kalpurush';
+        src: url('{{ public_path("fonts/kalpurush.ttf") }}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    body {
+        font-family: 'sans-serif';
+        margin: 0;
+        padding: 0;
+        /* font-size: 1px; */
+    }
+
+    .report-header {
+        width: 100%;
+        margin-bottom: 10px;
+        /* border-bottom: 1px solid #1e4981; */
+        text-align : center;
+    }
+
+    .bn {
+        font-family: 'kalpurush', sans-serif;
+        align-items: center;
+
+    }
+
+    .header-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed; /* Fix column widths */
+    }
+
+    .logo-cell {
+        /* width: 25%; */
+        /* text-align: center; */
+        /* vertical-align: middle; */
+    }
+
+    .logo-cell img {
+        /* max-height: 70px;
+        width: auto;
+        display: block; */
+        /* margin: 0 auto; */
+    }
+
+    .text-cell {
+        width: 100%;
+        text-align: left;
+        vertical-align: middle;
+        padding-left: 5px;
+    }
+
+    .govt-text {
+        font-size: 11px;
+        color: #1e4981;
+        /* margin-bottom: 20px !important; */
+    }
+
+    .name-bn {
+        font-size: 23px;
+        font-weight: bold;
+        color: #1e4981;
+        word-spacing: 1px;
+
+    }
+
+    .name-en {
+        font-size: 22px;
+        color: #c0392b;
+        word-spacing: 0px;
+    }
+
+    .about-text {
+        font-size: 16px;
+        color: #0a7c3a;
+        word-spacing: 1px;
+        padding-left:1px
+    }
+
+    .address-text {
+        font-size: 9px;
+        color: #000;
+        padding-left: 1px;
+    }
+</style>
+
 <div class="report-header">
-    <style>
-        .bn {
-            font-family: 'kalpurush', sans-serif !important;
-        }
-    </style>
     <table class="header-table">
         <tr>
             <td class="logo-cell">
