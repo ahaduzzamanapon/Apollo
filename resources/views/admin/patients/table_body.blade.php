@@ -1,6 +1,9 @@
 @foreach($reports as $report)
 <tr>
-    <td>{{ $report->report_code }}</td>
+    <td>
+        <strong>{{ $report->daily_id ?? $report->id }}</strong><br>
+        <small class="text-muted">{{ $report->report_code }}</small>
+    </td>
     <td>{{ date('d M, Y', strtotime($report->report_date)) }}</td>
     <td>{{ $report->patient->name }}</td>
     <td>{{ $report->patient->mobile }}</td>

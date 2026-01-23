@@ -53,7 +53,7 @@
             max-width: 400px;
         }
         .logo-img {
-            height: 80px;
+            height: 200px;
             width: auto;
             margin-bottom: 20px;
             object-fit: contain;
@@ -81,7 +81,7 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
         }
-        
+
         /* Mobile specific adjustments */
         @media (max-width: 768px) {
             .login-image-side {
@@ -116,8 +116,8 @@
                 @if($logoBase64)
                     <img src="{{ $logoBase64 }}" alt="Logo" class="logo-img bg-white  p-2 shadow mb-4">
                 @endif
-                <h1 class="fw-bold mb-2">{{ $center->name_en ?? config('app.name') }}</h1>
-                <h4 class="mb-4 text-white-50">{{ $center->name_bn ?? '' }}</h4>
+                <h1 class="fw-bold mb-2" style="white-space:nowrap">{{ $center->name_en ?? config('app.name') }}</h1>
+                <h4 class="text-white-50" style="white-space:nowrap;font-weight: bold;color:white !important">{{ $center->name_bn ?? '' }}</h4>
                 <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
                     <i class="bi bi-geo-alt-fill"></i>
                     <span>{{ $center->address ?? '' }}</span>
@@ -135,7 +135,7 @@
                 <div class="text-center mb-5 d-md-none">
                     <!-- Mobile Logo View -->
                     @if($logoBase64)
-                        <img src="{{ $logoBase64 }}" alt="Logo" class="logo-img mb-3">
+                        <img src="{{ $logoBase64 }}" alt="Logo" class="logo-img mb-3" style>
                     @endif
                     <h4 class="fw-bold">{{ $center->name_en ?? config('app.name') }}</h4>
                 </div>
@@ -172,7 +172,7 @@
                     <button type="submit" class="btn btn-primary btn-login w-100 mb-4">
                         Sign In <i class="bi bi-arrow-right ms-2"></i>
                     </button>
-                    
+
                     <div class="text-center text-muted small">
                         &copy; {{ date('Y') }} {{ $center->name_en }}. All rights reserved.
                     </div>

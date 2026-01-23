@@ -43,7 +43,10 @@
                 $due_amount += $report->due_amount;
             @endphp
             <tr>
-                <td>{{ $report->report_code }}</td>
+                <td>
+                    {{ $report->daily_id ?? $report->id }}<br>
+                    <small style="color: #777;">{{ $report->report_code }}</small>
+                </td>
                 <td>{{ date('d M, Y', strtotime($report->report_date)) }}</td>
                 <td>{{ $report->patient->name }}</td>
                 <td>{{ $report->patient->mobile }}</td>

@@ -49,6 +49,11 @@ Route::prefix('admin')->group(function () {
         // Accounts Report
         Route::get('accounts/report', [\App\Http\Controllers\Admin\AccountsReportController::class, 'index'])->name('accounts.report');
 
+        // Barcode Routes
+        Route::get('barcode/scanner', [\App\Http\Controllers\Admin\BarcodeController::class, 'scanner'])->name('admin.barcode.scanner');
+        Route::post('barcode/lookup', [\App\Http\Controllers\Admin\BarcodeController::class, 'lookup'])->name('admin.barcode.lookup');
+        Route::get('barcode/preview/{billNumber}', [\App\Http\Controllers\Admin\BarcodeController::class, 'preview'])->name('admin.barcode.preview');
+
         Route::get('patients/due', [PatientController::class, 'due'])->name('admin.patients.due');
         Route::post('patients/payment', [PatientController::class, 'addPayment'])->name('admin.patients.payment');
         Route::get('patients/{id}/download-invoice', [PatientController::class, 'downloadInvoice'])->name('patients.download_invoice');

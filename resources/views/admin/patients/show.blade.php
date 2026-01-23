@@ -5,7 +5,11 @@
     .table tbody td, .table thead th {
         padding : 2px;
     }
-    </style>
+    .barcode-container img {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
 <div class="container">
     <div class="row">
         <div class="col-md-8 offset-md-1">
@@ -14,59 +18,73 @@
                     <div class="text-center mb-4">
                         {{-- @include('admin.reports.center_header')
                         h4 --}}
-                        <h4 class="border-bottom">Invoice</h4>
+                        <h4 class="border-bottom">Money Receipt</h4>
                     </div>
 
-                    <div class="row mb-4" style="font-size:12px;border: 1px solid;line-height: 0px;padding-top: 25px;height:auto">
-                        <div class="col-md-6">
-                            <p><strong>Bill No:</strong> {{ $report->report_code }}</p>
-                            <p><strong>Date:</strong> {{ $report->report_date }}</p>
-                            <p><strong>Patient Name:</strong> {{ $report->patient->name }}</p>
-                        </div>
-                        <div class="col-md-6 text-end">
+                    <!-- Barcode Section -->
+                    <div style="margin-bottom: 10px;">
+                        <span>Bill No: <strong>{{ $report->report_code }}</strong></span>
+                        {!! \App\Services\BarcodeService::getHtmlImg($report->report_code, ['style' => 'height: 30px;width: 200px;float: right']) !!}
+                    </div>
 
-                            <p><strong>Gender:</strong>  {{ $report->patient->gender }}</p>
-                            <p><strong>Age:</strong> {{ $report->patient->age }} {{ $report->patient->age_unit }}</p>
-                            <p><strong>Mobile:</strong> {{ $report->patient->mobile }}</p>
-                        </div>
-                        <div class="col-md-12" style="margin-top:-10px">
-                            <p style="line-height: 18px"><strong>Ref. Doctor: DR.</strong> {{ $report->referenceDoctor->name ?? 'Self' }}</p>
+                    <div class="row mb-4" style="font-size:16px;border: 1px dashed #000;line-height: 15px;padding-top: 8px;height:auto">
+                        <div class="col-md-12">
+                            <div class="d-flex flex-row">
+                                <div class="d-flex flex-column">
+                                    <div class="mb-2">
+                                        <span>ID No:</span> <strong>{{ $report->daily_id ?? $report->id }}</strong>
+                                        <span style="margin-left: 45px">Mobile:</span> <strong> {{ $report->patient->mobile }}</strong>
+                                        <span style="margin-left: 40px">Date & Time:</span> <strong>{{ $report->report_date.date(' h:i A',strtotime($report->created_at)) }}</strong>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span>Patient Name:</span> <strong>{{ $report->patient->name }}</strong>
+                                        <span style="margin-left: 15px">Age:</span> <strong>{{ $report->patient->age }} {{ $report->patient->age_unit }}</strong>
+                                        <span style="margin-left: 15px">Gender:</span> <strong>{{ $report->patient->gender }}</strong>
+                                    </div>
+                                </div>
+   
+                            </div>
+                            <div class="d-flex flex-row mb-2">
+                                <div class="d-flex flex-column">
+                                    <span>Ref. by: <strong>{{ $report->referenceDoctor->name ?? 'Self' }}</strong></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th style="font-size:12px">Test Name</th>
-                                <th style="font-size: 12px" class="text-end">Price</th>
+                                <th style="font-size:17px">Test Name</th>
+                                <th style="font-size: 17px" class="text-end">Price</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($report->tests as $test)
                             <tr>
-                                <td  style="font-size:11px">{{ $test->category->test_name }}</td>
-                                <td style="font-size:11px" class="text-end">{{ $test->price }}</td>
+                                <td  style="font-weight: bold;font-size:16px">{{ $test->category->test_name }}</td>
+                                <td  style="font-weight: bold;font-size:16px" class="text-end">{{ $test->price }}</td>
                             </tr>
                             @endforeach
                             <tr>
-                                <th class="text-end" style="font-size:11px">Total Amount</th>
-                                <th class="text-end" style="font-size:11px">{{ $report->total_amount }}</th>
+                                <th class="text-end" style="font-size:16px">Total Amount</th>
+                                <th class="text-end" style="font-size:16px">{{ $report->total_amount }}</th>
                             </tr>
                              <tr>
-                                <th class="text-end" style="font-size:11px">Discount</th>
-                                <th class="text-end" style="font-size:11px">{{ $report->discount }}</th>
+                                <th class="text-end" style="font-size:16px">Discount</th>
+                                <th class="text-end" style="font-size:16px">{{ $report->discount }}</th>
                             </tr>
                              <tr>
-                                <th class="text-end" style="font-size:11px">Net Payable</th>
-                                <th class="text-end" style="font-size:11px">{{ $report->final_amount }}</th>
+                                <th class="text-end" style="font-size:16px">Net Payable</th>
+                                <th class="text-end" style="font-size:16px">{{ $report->final_amount }}</th>
                             </tr>
                              <tr>
-                                <th class="text-end" style="font-size:11px">Paid Amount</th>
-                                <th class="text-end" style="font-size:11px">{{ $report->paid_amount }}</th>
+                                <th class="text-end" style="font-size:16px">Paid Amount</th>
+                                <th class="text-end" style="font-size:16px">{{ $report->paid_amount }}</th>
                             </tr>
                              <tr>
-                                <th class="text-end" style="font-size:11px">Due Amount</th>
-                                <th class="text-end" style="font-size:11px">{{ $report->due_amount }}</th>
+                                <th class="text-end" style="font-size:16px">Due Amount</th>
+                                <th class="text-end" style="font-size:16px">{{ $report->due_amount }}</th>
                             </tr>
                         </tbody>
                         </tbody>
@@ -88,12 +106,12 @@
                         <tbody >
                             @forelse($report->payments as $payment)
                             <tr>
-                                <td style="font-size:11px">{{ $payment->created_at->format('Y-m-d h:i A') }}</td>
-                                <td style="font-size:11px">{{ $payment->payment_method }}</td>
-                                <td style="font-size:11px" class="fw-bold">{{ $payment->amount }}</td>
-                                <td style="font-size:11px" class="text-danger">{{ $payment->discount > 0 ? $payment->discount : '-' }}</td>
-                                <td style="font-size:11px">{{ $payment->collectedBy->name ?? 'N/A' }}</td>
-                                <td style="font-size:11px;white-space:pre-line">{{ $payment->remarks }}</td>
+                                <td style="font-size:16px">{{ $payment->created_at->format('Y-m-d h:i A') }}</td>
+                                <td style="font-size:16px">{{ $payment->payment_method }}</td>
+                                <td style="font-size:16px" class="fw-bold">{{ $payment->amount }}</td>
+                                <td style="font-size:16px" class="text-danger">{{ $payment->discount > 0 ? $payment->discount : '-' }}</td>
+                                <td style="font-size:16px">{{ $payment->collectedBy->name ?? 'N/A' }}</td>
+                                <td style="font-size:16px;white-space:pre-line">{{ $payment->remarks }}</td>
                             </tr>
                             @empty
                             <tr>

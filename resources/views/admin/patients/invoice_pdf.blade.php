@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Invoice - {{ $report->report_code }}</title>
@@ -33,7 +33,8 @@
         .invoice-title {
             font-size: 13px;
             font-weight: bold;
-            margin-top: 3px;
+            margin: 5px 0;
+            text-align: center;
         }
 
         /* ================= FOOTER ================= */
@@ -52,20 +53,15 @@
             border-collapse: collapse;
         }
 
-        .info-table td {
-            font-size: 12px;
-            padding: 2px;
-        }
-
         .items-table th,
         .items-table td {
             border: 1px solid #000;
             padding: 4px;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .totals-table {
-            width: 45%;
+            width: 60%;
             margin-left: auto;
         }
 
@@ -73,24 +69,34 @@
         .totals-table td {
             border: 1px solid #000;
             padding: 4px;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .text-end {
             text-align: right;
         }
 
-        /* ================= PAGE BREAK ================= */
         .page-break {
             page-break-before: always;
         }
 
+        /* ================= WATERMARK ================= */
+        /* .watermark {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            opacity: 0.08;
+            width: 350px;
+        } */
+
         .bangla-text {
-            font-family: 'kalpurush';
-            font-size: 11px;
+            font-family: 'kalpurush', sans-serif !important;
+            font-size: 14px;
         }
 
         .bangla-vertical {
+            font-family: 'kalpurush', sans-serif !important;
             border: 1px solid #000;
             border-radius: 8px;
             padding: 3px;
@@ -102,13 +108,48 @@
 
 <body>
 
-<!-- ================= HEADER (ALL PAGES) ================= -->
+{{-- ================= WATERMARK LOGIC ================= --}}
+{{-- @php
+    $center = \App\Models\CenterDetails::first();
+    $logoBase64 = null;
+
+    if ($center && $center->logo_image) {
+        $logoPath = public_path('storage/' . $center->logo_image);
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+    }
+@endphp --}}
+
+{{-- @if($logoBase64)
+    <img src="{{ $logoBase64 }}" class="watermark">
+@endif --}}
+
+{{-- ================= HEADER ================= --}}
 <div class="header">
     @include('admin.reports.center_header')
 </div>
-<div class="invoice-title" style="padding-bottom: 5px;padding-top:5px;text-align: center">MONEY RECEIPT</div>
 
-<!-- ================= FOOTER (ALL PAGES) ================= -->
+<div class="invoice-title">
+    <u>MONEY RECEIPT</u>
+</div>
+
+<div style="margin-top: 20px;">
+    <span style="font-size: 14px;">
+        Bill No: <strong>{{ $report->report_code }}</strong>
+    </span>
+
+    {!! \App\Services\BarcodeService::getHtmlImg(
+        $report->report_code,
+        ['style' => 'height:25px;width:200px;float:right']
+    ) !!}
+</div>
+
+<br>
+
+{{-- ================= FOOTER ================= --}}
 <div class="footer">
     <p class="bangla-text">
         রিপোর্ট সংগ্রহের শেষ সময় রাত ১১.০০, রিপোর্ট নেয়ার সময় রিসিট অবশ্যই সাথে আনতে হবে
@@ -119,7 +160,7 @@
     </p>
 
     <p class="bangla-text" style="border-bottom:1px solid #000">
-        {{ $center->address }} মোবাইলঃ {{ '0'.$center->phone }}
+        {{ $center->address }} মোবাইলঃ {{ $center->phone }}
     </p>
 
     <p>
@@ -128,28 +169,40 @@
     </p>
 </div>
 
-<!-- ================= PATIENT INFO (FIRST PAGE ONLY) ================= -->
-<table class="info-table" style="border:1px solid #000; margin-bottom:10px;">
+{{-- ================= PATIENT INFO ================= --}}
+<table style="font-size: 12px; border:1px dashed #000;text-transform: uppercase;">
     <tr>
-        <td width="55%">
-            <strong>Bill No:</strong> {{ $report->report_code }}<br>
-            <strong>Date:</strong> {{ date('d M, Y', strtotime($report->report_date)) }}<br>
-            <strong>Patient Name:</strong> {{ $report->patient->name }}
-        </td>
-        <td width="45%" class="text-end">
-            <strong>Gender:</strong> {{ $report->patient->gender }}<br>
-            <strong>Age:</strong> {{ $report->patient->age }} {{ $report->patient->age_unit }}<br>
-            <strong>Mobile:</strong> {{ $report->patient->mobile }}
-        </td>
+        <td style="white-space:nowrap;padding:2px 3px">ID No</td>
+        <td style="white-space:nowrap;padding:2px 3px">:</td>
+        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->daily_id ?? $report->id }}</strong></td>
+        <td style="white-space:nowrap;padding:2px 3px">Mobile</td>
+        <td style="white-space:nowrap;padding:2px 3px">:</td>
+        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->patient->mobile }}</strong></td>
+        <td style="white-space:nowrap;padding:2px 3px">Date & Time</td>
+        <td style="white-space:nowrap;padding:2px 3px">:</td>
+        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ date('d M Y, h:i A', strtotime($report->created_at)) }}</strong></td>
     </tr>
     <tr>
-        <td colspan="2">
-            <strong>Ref. Doctor Name: DR.</strong>  {{ $report->referenceDoctor->name ?? 'Self' }}
-        </td>
+        <td style="white-space:nowrap;padding:2px 3px">Patient Name </td>
+        <td style="white-space:nowrap;padding:2px 3px">:</td>
+        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->patient->name }}</strong></td>
+        <td style="white-space:nowrap;padding:2px 3px">Age</td>
+        <td style="white-space:nowrap;padding:2px 3px">:</td>
+        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->patient->age }} {{ $report->patient->age_unit }}</strong></td>
+        <td style="white-space:nowrap;padding:2px 3px">Gender</td>
+        <td style="white-space:nowrap;padding:2px 3px">:</td>
+        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->patient->gender }}</strong></td>
+    </tr>
+    <tr>
+        <td style="white-space:nowrap;padding:2px 3px">Ref. Doctor</td>
+        <td style="white-space:nowrap;padding:2px 3px">:</td>
+        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->referenceDoctor->name ?? 'Self' }}</strong></td>
     </tr>
 </table>
 
-<!-- ================= TEST LIST (22 PER PAGE) ================= -->
+<br>
+
+{{-- ================= TEST LIST ================= --}}
 @php
     $chunks = $report->tests->chunk(22);
 @endphp
@@ -177,33 +230,51 @@
         </tbody>
     </table>
 
-    <!-- ================= TOTALS (LAST PAGE ONLY) ================= -->
+    {{-- ================= TOTALS (LAST PAGE) ================= --}}
     @if($loop->last)
-        <br>
-        <table class="totals-table">
-            <tr>
-                <th>Total</th>
-                <td class="text-end">{{ number_format($report->total_amount, 0) }}</td>
-            </tr>
-            <tr>
-                <th>Discount</th>
-                <td class="text-end">{{ number_format($report->discount, 0) }}</td>
-            </tr>
-            <tr>
-                <th>Net Payable</th>
-                <td class="text-end">
-                    <strong>{{ number_format($report->final_amount, 0) }}</strong>
-                </td>
-            </tr>
-            <tr>
-                <th>Paid</th>
-                <td class="text-end">{{ number_format($report->paid_amount, 0) }}</td>
-            </tr>
-            <tr>
-                <th>Due</th>
-                <td class="text-end">{{ number_format($report->due_amount, 0) }}</td>
-            </tr>
-        </table>
+
+        <div style="width: 100%; display: flex; justify-content: space-between; ">
+            <div style="width: 40%;">
+                <table style="width: 100%; border-collapse: collapse; line-height: 1.5;">
+                    <tr>
+                        <td style="font-size: 14px; font-weight: bold; padding: 3px; display: flex; align-items: center;">Note:</td>
+                        <td style="padding-top: 50px !important;font-size: 14px; font-weight: bold; padding: 3px; display: flex; align-items: center;white-space:nowrap ">
+                            @if($report->due_amount == 0)
+                                <span style="display: inline-block;font-weight: bold; padding: 5px 15px; border: 1px solid #28a745; color: #28a745; font-size: 30px; font-weight: bold; border-radius: 5px; padding-left: 100px;float:center !important">PAID</span>
+                            @else
+                                <span style="display: inline-block;font-weight: bold; padding: 5px 15px; border: 1px solid #dc3545; color: #dc3545; font-size: 30px; font-weight: bold; border-radius: 5px; margin-left: 100px;float:center !important">DUE : {{ number_format($report->due_amount, 0) }} TK.</span>
+                            @endif
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="width: 60%; float: right;">
+                <table class="totals-table" style="font-size:14px; margin-left: auto;float: right;margin-top: -35px;">
+                    <tr>
+                        <th style="font-size:11px">Total</th>
+                        <td style="font-size:11px" class="text-end">{{ number_format($report->total_amount, 0) }}</td>
+                    </tr>
+                    <tr>
+                        <th style="font-size:11px">Discount</th>
+                        <td style="font-size:11px" class="text-end">{{ number_format($report->discount, 0) }}</td>
+                    </tr>
+                    <tr>
+                        <th style="font-size:11px">Net Payable</th>
+                        <td style="font-size:11px" class="text-end">
+                            <strong>{{ number_format($report->final_amount, 0) }}</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="font-size:11px">Paid</th>
+                        <td style="font-size:11px" class="text-end">{{ number_format($report->paid_amount, 0) }}</td>
+                    </tr>
+                    <tr>
+                        <th style="font-size:11px">Due</th>
+                        <td style="font-size:11px" class="text-end">{{ number_format($report->due_amount, 0) }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     @endif
 
 @endforeach

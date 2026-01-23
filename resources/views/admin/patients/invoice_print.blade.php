@@ -98,16 +98,39 @@
 
     /* ================= BANGLA ================= */
     .bangla-text {
-        font-family: 'kalpurush';
+        font-family: 'kalpurush', sans-serif !important;
         font-size: 8.5px;
     }
 
     .bangla-vertical {
+        font-family: 'kalpurush', sans-serif !important;
         border: 1px solid #000;
         border-radius: 6px;
         padding: 2px 6px;
         display: inline-block;
         margin: 3px auto;
+    }
+
+    /* ================= WATERMARK ================= */
+    .watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0.1;
+        z-index: -1;
+        width: 280px;
+        height: 280px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        pointer-events: none;
+    }
+
+    @media print {
+        .watermark {
+            opacity: 0.2;
+        }
     }
     </style>
 
@@ -115,6 +138,24 @@
 </head>
 
 <body >
+
+<!-- ================= WATERMARK ================= -->
+{{-- @php
+    $center = \App\Models\CenterDetails::first();
+    $logoBase64 = null;
+    if ($center && $center->logo_image) {
+        $logoPath = public_path('storage/' . $center->logo_image);
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+    }
+@endphp --}}
+{{--
+@if($logoBase64)
+<div class="watermark" style="background-image: url('{{ $logoBase64 }}');"></div>
+@endif --}}
 
 <!-- ================= HEADER (ALL PAGES) ================= -->
 <div class="header">
@@ -139,7 +180,7 @@
                     <img src="{{ $logoBase64 }}" style="height: 60px; width: auto;">
                 @endif
             </td>
-            
+
             <!-- Info Column -->
             <td width="80%" style="text-align: center; vertical-align: middle;">
                 <div style="font-size: 10px; color: #1e4981;">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার অনুমোদিত</div>
@@ -150,54 +191,52 @@
             </td>
         </tr>
     </table>
-    
-    <div class="invoice-title" style="text-align: center; font-size: 12px; font-weight: bold; margin-top: 2px; text-decoration: underline;">MONEY RECEIPT</div>
-   
-</div> 
+
+    <div class="invoice-title" style="text-align: center; font-size: 17px; font-weight: bold; margin-top: 2px; text-decoration: underline;padding-bottom: 5px;">MONEY RECEIPT</div>
+</div>
 <!-- Space for Header -->
 <div style="height: 25mm;"></div>
 
 <!-- ================= FOOTER (ALL PAGES) ================= -->
-<div class="footer">
-    <p class="bangla-text">
-        রিপোর্ট সংগ্রহের শেষ সময় রাত ১১.০০, রিপোর্ট নেয়ার সময় রিসিট অবশ্যই সাথে আনতে হবে
-    </p>
-
-    <p class="bangla-text bangla-vertical">
-        ডেলিভারী তারিখ হতে ৩০ দিনের মধ্যে রিপোর্ট সংগ্রহ করা যাবে
-    </p>
-
-    <p class="bangla-text" style="border-bottom:1px solid #000">
-        {{ $center->address }} মোবাইলঃ {{ '0'.$center->phone }}
-    </p>
-
-    <p>
-        Computer Generated Invoice |
-        Printed: {{ date('d M, Y h:i A') }}
-    </p>
+<div style="margin-top: 20px;margin-bottom: 10px;" >
+    <span style="font-size: 12px;">Bill No: <strong>{{ $report->report_code }}</strong></span>
+    {!! \App\Services\BarcodeService::getHtmlImg($report->report_code, ['style' => 'height: 25px;width: 200px;float: right']) !!}
 </div>
 
 <!-- ================= PATIENT INFO (FIRST PAGE ONLY) ================= -->
-<table class="info-table" style="border:1px solid #000; margin-bottom:5px;margin-top:15px">
-    <tr>
-        <td width="55%">
-            <strong>Bill No:</strong> {{ $report->report_code }}<br>
-            <strong>Date:</strong> {{ date('d M, Y', strtotime($report->report_date)) }}<br>
-            <strong>Patient:</strong> {{ $report->patient->name }}
-        </td>
-        <td width="45%" class="text-end">
-            <strong>Gender:</strong> {{ $report->patient->gender }}<br>
-            <strong>Age:</strong> {{ $report->patient->age }} {{ $report->patient->age_unit }}<br>
-            <strong>Mobile:</strong> {{ $report->patient->mobile }}
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <strong>Ref:</strong> DR. {{ $report->referenceDoctor->name ?? 'Self' }}
-        </td>
-    </tr>
-</table>
 
+<div class="row mb-4" style="text-transform: uppercase;font-size:15px;border: 1px dashed #000;line-height: 20px;padding-top: 8px;height:auto">
+    <div class="col-md-12">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="width: 14%; padding: 2px 5px;white-space:nowrap"><span>ID No</span></td>
+                <td style="width: 2%; padding: 2px 2px; text-align: center; font-weight: bold;">:</td>
+                <td style="width: 18%; padding: 2px 5px;white-space:nowrap"><strong>{{ $report->daily_id ?? $report->id }}</strong></td>
+                <td style="width: 14%; padding: 2px 5px;white-space:nowrap"><span>Mobile</span></td>
+                <td style="width: 2%; padding: 2px 2px; text-align: center; font-weight: bold;">:</td>
+                <td style="width: 18%; padding: 2px 5px;white-space:nowrap"><strong>{{ $report->patient->mobile }}</strong></td>
+                <td style="width: 14%; padding: 2px 5px;white-space:nowrap"><span>Date & Time</span></td>
+                <td style="width: 2%; padding: 2px 2px; text-align: center; font-weight: bold;">:</td>
+                <td style="width: 16%; padding: 2px 5px;white-space:nowrap"><strong>{{ date('d M Y', strtotime($report->report_date)).date(' h:i A',strtotime($report->created_at)) }}</strong></td>
+            </tr>
+            <tr>
+                <td style="width: 14%; padding: 2px 5px;white-space:nowrap"><span>Patient Name</span></td>
+                <td style="width: 2%; padding: 2px 2px; text-align: center; font-weight: bold;">:</td>
+                <td style="width: 18%; padding: 2px 5px;white-space:nowrap"><strong style="word-wrap: break-word; overflow-wrap: break-word;">{{ $report->patient->name }}</strong></td>
+                <td style="width: 14%; padding: 2px 5px;white-space:nowrap"><span>Age</span></td>
+                <td style="width: 2%; padding: 2px 2px; text-align: center; font-weight: bold;">:</td>
+                <td style="width: 18%; padding: 2px 5px;white-space:nowrap"><strong>{{ $report->patient->age }} {{ $report->patient->age_unit }}</strong></td>
+                <td style="width: 14%; padding: 2px 5px;white-space:nowrap"><span>Gender</span></td>
+                <td style="width: 2%; padding: 2px 2px; text-align: center; font-weight: bold;">:</td>
+                <td style="width: 16%; padding: 2px 5px;white-space:nowrap"><strong>{{ $report->patient->gender }}</strong></td>
+            </tr>
+        </table>
+        <div class="d-flex flex-row mb-2">
+            <div class="d-flex flex-column" style="padding: 2px 5px;">
+                Ref. By: <strong>{{ $report->referenceDoctor->name ?? 'Self' }}</strong></div>
+            </div>
+    </div>
+</div>
 <!-- ================= TEST LIST (22 PER PAGE) ================= -->
 @php
     $chunks = $report->tests->chunk(22);
@@ -209,18 +248,18 @@
         <div class="page-break"></div>
     @endif
 
-    <table class="items-table">
+    <table class="items-table mt-2" style="margin-top: 10px;">
         <thead>
             <tr>
-                <th>Test Name</th>
-                <th width="20%" class="text-end">Price</th>
+                <th style="font-size:15px   ">Test Name</th>
+                <th style="font-size:15px   " width="20%" class="text-end">Price</th>
             </tr>
         </thead>
         <tbody>
             @foreach($tests as $test)
             <tr>
-                <td>{{ $test->category->test_name }}</td>
-                <td class="text-end">{{ number_format($test->price, 0) }}</td>
+                <td style="font-size:15px;font-weight: bold">{{ $test->category->test_name }}</td>
+                <td style="font-size:15px;font-weight: bold" class="text-end">{{ number_format($test->price, 0) }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -228,32 +267,69 @@
 
     <!-- ================= TOTALS (LAST PAGE ONLY) ================= -->
     @if($loop->last)
-        <br>
-        <table class="totals-table">
-            <tr>
-                <th>Total</th>
-                <td class="text-end">{{ number_format($report->total_amount, 0) }}</td>
-            </tr>
-            <tr>
-                <th>Discount</th>
-                <td class="text-end">{{ number_format($report->discount, 0) }}</td>
-            </tr>
-            <tr>
-                <th>Net Payable</th>
-                <td class="text-end">
-                    <strong>{{ number_format($report->final_amount, 0) }}</strong>
-                </td>
-            </tr>
-            <tr>
-                <th>Paid</th>
-                <td class="text-end">{{ number_format($report->paid_amount, 0) }}</td>
-            </tr>
-            <tr>
-                <th>Due</th>
-                <td class="text-end">{{ number_format($report->due_amount, 0) }}</td>
-            </tr>
-        </table>
+
+        <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 20px;">
+            <div style="width: 40%;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="font-size: 20px; font-weight: bold; padding: 3px;">Note:</td>
+                        <td style="font-size: 30px; padding: 3px;font-weight: bold; text-align: center;">
+                            @if($report->due_amount == 0)
+                                <span style="display: inline-block;font-weight: bold ;padding: 5px 15px; border: 1px solid #28a745; color: #28a745; font-size: 30px; font-weight: bold; border-radius: 5px;">PAID</span>
+                            @else
+                                <span style="display: inline-block;font-weight: bold; padding: 5px 15px; border: 1px solid #dc3545; color: #dc3545; font-size: 30px; font-weight: bold; border-radius: 5px;white-space:nowrap">DUE : {{ number_format($report->due_amount, 0) }} TK.</span>
+                            @endif
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="width: 60%;">
+                <table class="totals-table" style="font-size:15px; margin-left: auto;">
+                    <tr>
+                        <th style="font-size:15px">Total</th>
+                        <td style="font-size:15px" class="text-end">{{ number_format($report->total_amount, 0) }}</td>
+                    </tr>
+                    <tr>
+                        <th style="font-size:15px">Discount</th>
+                        <td style="font-size:15px" class="text-end">{{ number_format($report->discount, 0) }}</td>
+                    </tr>
+                    <tr>
+                        <th style="font-size:15px">Net Payable</th>
+                        <td style="font-size:15px" class="text-end">
+                            <strong>{{ number_format($report->final_amount, 0) }}</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="font-size:15px">Paid</th>
+                        <td style="font-size:15px" class="text-end">{{ number_format($report->paid_amount, 0) }}</td>
+                    </tr>
+                    <tr>
+                        <th style="font-size:15px">Due</th>
+                        <td style="font-size:15px" class="text-end">{{ number_format($report->due_amount, 0) }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     @endif
+
+    <div class="footer" >
+    <p class="bangla-text" style="font-size: 14px;">
+        রিপোর্ট সংগ্রহের শেষ সময় রাত ১১.০০, রিপোর্ট নেয়ার সময় রিসিট অবশ্যই সাথে আনতে হবে
+    </p>
+
+    <p class="bangla-text bangla-vertical" style="font-size: 14px;">
+        ডেলিভারী তারিখ হতে ৩০ দিনের মধ্যে রিপোর্ট সংগ্রহ করা যাবে
+    </p>
+
+    <p class="bangla-text" style="border-bottom:1px solid #000;font-size: 12px;">
+        {{ $center->address }} মোবাইলঃ {{ $center->phone }}
+    </p>
+
+    <p style="font-size: 14px;">
+        Prepared By: {{ auth()->user()->name }} |
+        Printed: {{ date('d M, Y h:i A') }}
+    </p>
+</div>
 
 @endforeach
 

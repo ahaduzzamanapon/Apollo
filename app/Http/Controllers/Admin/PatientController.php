@@ -29,6 +29,7 @@ class PatientController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('report_code', 'like', "%{$search}%")
+                    ->orWhere('daily_id', 'like', "%{$search}%")
                     ->orWhereHas('patient', function ($p) use ($search) {
                         $p->where('name', 'like', "%{$search}%")
                             ->orWhere('mobile', 'like', "%{$search}%");
@@ -101,6 +102,7 @@ class PatientController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('report_code', 'like', "%{$search}%")
+                    ->orWhere('daily_id', 'like', "%{$search}%")
                     ->orWhereHas('patient', function ($p) use ($search) {
                         $p->where('name', 'like', "%{$search}%")
                             ->orWhere('mobile', 'like', "%{$search}%");
@@ -187,7 +189,8 @@ class PatientController extends Controller
             'paid_amount' => 'nullable|numeric',
         ]);
 
-        // Calculate DOB based on Age & Unit
+        return \DB::transaction(function () use ($request) {
+            // Calculate DOB based on Age & Unit
         $dob = null;
         if ($request->age_unit == 'Years') {
             $dob = Carbon::now()->subYears($request->age);
@@ -208,14 +211,21 @@ class PatientController extends Controller
             'gender' => $request->gender,
         ]);
 
-        // 2. Create Report Header
-        // Generate Unique ID: ADDC_000001
+        // Generate Unique ID (Daily Resetting ID)
+        $today = Carbon::today();
+        $lastDailyReport = PatientReport::whereDate('created_at', $today)
+            ->latest('id')
+            ->first();
+        $dailyId = $lastDailyReport ? $lastDailyReport->daily_id + 1 : 1;
+
+        // Generate Report Code: ADDC_000001
         $lastReport = PatientReport::latest('id')->first();
         $nextId = $lastReport ? $lastReport->id + 1 : 1;
         $reportCode = 'ADDC_'.str_pad($nextId, 6, '0', STR_PAD_LEFT);
 
         $report = PatientReport::create([
             'report_code' => $reportCode,
+            'daily_id' => $dailyId,
             'patient_id' => $patient->id,
             'reference_doctor_id' => $request->reference_doctor_id,
             'ref_by_someone' => $request->has('ref_by_someone') ? 1 : 0,
@@ -313,7 +323,8 @@ class PatientController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.patients.show', $report->id)->with('success', 'Report Entry Created Successfully');
+            return redirect()->route('admin.patients.show', $report->id)->with('success', 'Report Entry Created Successfully');
+        });
     }
 
     public function addPayment(Request $request)
@@ -403,7 +414,12 @@ class PatientController extends Controller
                 ],
             ],
             'format' => 'A5',
-            'margin' => 15,
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 15,
+            'margin_bottom' => 15,
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
         ]);
 
         // Load Blade view (same as DOMPDF)
@@ -413,7 +429,7 @@ class PatientController extends Controller
 
         // Stream PDF (browser preview)
       return response(
-        $mpdf->Output('invoice_'.$report->report_code.'.pdf', 'S'))
+        $mpdf->Output('invoice_'.$report->report_code.'.pdf', 'I'))
              ->header('Content-Type', 'application/pdf')
              ->header('Content-Disposition', 'attachment; filename="invoice_'.$report->report_code.'.pdf"');
 

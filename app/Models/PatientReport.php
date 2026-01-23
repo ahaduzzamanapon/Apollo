@@ -20,6 +20,7 @@ class PatientReport extends Model
         'final_amount',
         'paid_amount',
         'due_amount',
+        'daily_id',
     ];
 
     public function patient()
