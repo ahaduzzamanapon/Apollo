@@ -108,25 +108,6 @@
 
 <body>
 
-{{-- ================= WATERMARK LOGIC ================= --}}
-{{-- @php
-    $center = \App\Models\CenterDetails::first();
-    $logoBase64 = null;
-
-    if ($center && $center->logo_image) {
-        $logoPath = public_path('storage/' . $center->logo_image);
-        if (file_exists($logoPath)) {
-            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        }
-    }
-@endphp --}}
-
-{{-- @if($logoBase64)
-    <img src="{{ $logoBase64 }}" class="watermark">
-@endif --}}
-
 {{-- ================= HEADER ================= --}}
 <div class="header">
     @include('admin.reports.center_header')
@@ -188,15 +169,17 @@
         <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->patient->name }}</strong></td>
         <td style="white-space:nowrap;padding:2px 3px">Age</td>
         <td style="white-space:nowrap;padding:2px 3px">:</td>
-        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->patient->age }} {{ $report->patient->age_unit }}</strong></td>
+        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->patient->long_formatted_age }}</strong></td>
         <td style="white-space:nowrap;padding:2px 3px">Gender</td>
         <td style="white-space:nowrap;padding:2px 3px">:</td>
         <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->patient->gender }}</strong></td>
     </tr>
     <tr>
-        <td style="white-space:nowrap;padding:2px 3px">Ref. Doctor</td>
-        <td style="white-space:nowrap;padding:2px 3px">:</td>
-        <td style="white-space:nowrap;padding:2px 3px"><strong>{{ $report->referenceDoctor->name ?? 'Self' }}</strong></td>
+        <td style="padding:2px 3px">Ref. Doctor</td>
+        <td style="padding:2px 3px">:</td>
+        <td colspan="7" style="padding:2px 3px">
+            <strong>{{ $report->referenceDoctor->name ?? 'Self' }}</strong>
+        </td>
     </tr>
 </table>
 
@@ -242,7 +225,7 @@
                             @if($report->due_amount == 0)
                                 <span style="display: inline-block;font-weight: bold; padding: 5px 15px; border: 1px solid #28a745; color: #28a745; font-size: 30px; font-weight: bold; border-radius: 5px; padding-left: 100px;float:center !important">PAID</span>
                             @else
-                                <span style="display: inline-block;font-weight: bold; padding: 5px 15px; border: 1px solid #dc3545; color: #dc3545; font-size: 30px; font-weight: bold; border-radius: 5px; margin-left: 100px;float:center !important">DUE : {{ number_format($report->due_amount, 0) }} TK.</span>
+                                <span style="display: inline-block;font-weight: bold; padding: 5px 15px; border: 1px solid #dc3545; color: #dc3545; font-size: 30px; font-weight: bold; border-radius: 5px; margin-left: 100px;float:center !important">DUE : {{ number_format($report->due_amount, 0) }} </span>
                             @endif
                         </td>
                     </tr>

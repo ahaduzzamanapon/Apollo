@@ -26,7 +26,7 @@ class DashboardController extends Controller
         // 2. Total Test Report Daily & List
         $todayReportsQuery = PatientReport::whereDate('report_date', Carbon::today());
         $todayReports = $todayReportsQuery->count();
-        $todayReportList = $todayReportsQuery->with('patient')->get();
+        $todayReportList = $todayReportsQuery->with(['patient', 'tests.category'])->get();
         
         // 5. Total Daily Expense & List
         $todayExpenseQuery = Expense::whereDate('date', Carbon::today());
@@ -43,7 +43,8 @@ class DashboardController extends Controller
 
         // 4. Total Doctor Honorarium Daily & List
         $dailyHonorariumQuery = PatientTest::whereHas('report', function($q) {
-            $q->whereDate('report_date', Carbon::today());
+            $q->whereDate('report_date', Carbon::today())
+              ->where('ref_by_someone', 0);
         })->where('commission_amount', '>', 0);
         
         $totalDailyHonorarium = $dailyHonorariumQuery->sum('commission_amount');

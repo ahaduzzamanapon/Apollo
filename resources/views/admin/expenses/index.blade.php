@@ -107,7 +107,9 @@
                             </div>
                             <div class="mb-3">
                                 <label>Amount</label>
-                                <input type="number" step="0.01" name="amount" class="form-control" required>
+                                <input type="number" step="0.01" name="amount" class="form-control" value="0" required
+                                       onfocus="if(this.value=='0' || this.value=='0.00') this.value=''" 
+                                       onblur="if(this.value=='') this.value='0.00'">
                             </div>
                             <div class="mb-3">
                                 <label>Description</label>

@@ -10,6 +10,8 @@ class PatientTest extends Model
         'patient_report_id',
         'report_category_id',
         'price',
+        'discount',
+        'discount_percent',
         'commission_amount',
         'approval_status',
         'approved_amount',

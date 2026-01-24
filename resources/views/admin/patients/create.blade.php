@@ -6,10 +6,20 @@
 <style>
     .select2-container .select2-selection--single {
         height: 38px !important;
-        padding: 5px;
+        padding: 2px;
     }
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 36px !important;
+    }
+    label {
+        font-size: 14px;
+    }
+    .form-control, .form-select {
+        border-radius: 6px;
+        padding: 6px;
+        border: 1px solid #e2e8f0;
+        font-size: 13px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
 </style>
 <div class="row">
@@ -31,31 +41,31 @@
             <!-- Patient Info -->
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">Patient Information</div>
-                <div class="card-body">
-                    <div class="row">
+                <div class="card-body" >
+                    <div class="row" >
                         <div class="col-md-2 mb-3">
-                            <label>Report/Entry Date</label>
+                            <label>Date</label>
                             <input type="date" name="report_date" class="form-control" value="{{ date('Y-m-d') }}" required>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label>Patient Name</label>
                             <input type="text" name="patient_name" class="form-control" required>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label>Mobile Number</label>
                             <input type="text" name="mobile" class="form-control" required>
                         </div>
-                        <div class="col-md-2 mb-3">
-                            <label>Age</label>
-                            <input type="number" name="age" class="form-control" required>
+                        <div class="col-md-1 mb-3">
+                            <label>Years</label>
+                            <input type="number" name="age_years" class="form-control" value="0" min="0" onfocus="if(this.value=='0') this.value=''" onblur="if(this.value=='') this.value='0'">
                         </div>
-                        <div class="col-md-2 mb-3">
-                            <label>Age Unit</label>
-                            <select name="age_unit" class="form-control">
-                                <option value="Years">Years</option>
-                                <option value="Months">Months</option>
-                                <option value="Days">Days</option>
-                            </select>
+                        <div class="col-md-1 mb-3">
+                            <label>Months</label>
+                            <input type="number" name="age_months" class="form-control" value="0" min="0" max="11" onfocus="if(this.value=='0') this.value=''" onblur="if(this.value=='') this.value='0'">
+                        </div>
+                        <div class="col-md-1 mb-3">
+                            <label>Days</label>
+                            <input type="number" name="age_days" class="form-control" value="0" min="0" max="30" onfocus="if(this.value=='0') this.value=''" onblur="if(this.value=='') this.value='0'">
                         </div>
                         <div class="col-md-2 mb-3">
                             <label>Gender</label>
@@ -65,11 +75,11 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label>NID (Optional)</label>
                             <input type="text" name="nid" class="form-control">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="d-flex justify-content-between">
                                 <label>Reference Doctor</label>
                                 <div class="form-check">
@@ -79,13 +89,27 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="input-group">
-                                <select name="reference_doctor_id" id="referenceDoctorSelect" class="form-control search-select">
-                                    <option value="">Select Doctor</option>
-                                    @foreach($doctors as $doctor)
-                                        <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
-                                    @endforeach
-                                </select>
+                            <!-- Standard Commission List -->
+                            <div id="refDoctorContainer">
+                                <div class="input-group">
+                                    <select name="reference_doctor_id" id="referenceDoctorSelect" class="form-control search-select">
+                                        <option value="">Select Doctor</option>
+                                        @foreach($doctors as $doctor)
+                                            <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- No Commission List -->
+                            <div id="refSomeoneContainer" style="display: none;">
+                                <div class="input-group">
+                                    <select name="reference_doctor_id" id="refSomeoneSelect" class="form-control search-select" disabled>
+                                        <option value="">Select Doctor (No Comm.)</option>
+                                        @foreach($doctors as $doctor)
+                                            <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-2 mb-3">
@@ -117,8 +141,10 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th style="width:35pc">Test Name</th>
+                                <th style="width:30pc">Test Name</th>
                                 <th>Price</th>
+                                <th>Flat Discount</th>
+                                <th>Percentage(%) Discount</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -127,27 +153,26 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="2" class="text-end">Total</th>
+                                <th colspan="3" class="text-end">Total</th>
                                 <th><input type="number" id="totalAmount" class="form-control" readonly value="0"></th>
                             </tr>
                             <tr>
-                                <th colspan="2" class="text-end">Discount</th>
+                                <th colspan="3" class="text-end">Total Discount</th>
                                 <th>
-                                    <div class="d-flex gap-2">
-                                        <input type="number" id="discountFlat" class="form-control" placeholder="Flat" oninput="calculateTotal()">
-                                        <input type="number" id="discountPercent" class="form-control" placeholder="%" oninput="calculateTotal()">
-                                        <input type="hidden" name="discount" id="finalDiscount" value="0">
-                                    </div>
+                                    <input type="number" name="discount" id="finalDiscount" class="form-control" readonly value="0">
                                 </th>
                             </tr>
                             <tr>
-                                <th colspan="2" class="text-end">Net Payable</th>
+                                <th colspan="3" class="text-end">Net Payable</th>
                                 <th><input type="number" id="netPayable" class="form-control" readonly value="0"></th>
                             </tr>
                             <tr>
-                                <th colspan="2" class="text-end">Paid Amount</th>
+                                <th colspan="3" class="text-end">Paid Amount</th>
                                 <th>
-                                    <input type="number" name="paid_amount" id="paidAmount" class="form-control mb-2" value="0" oninput="calculateTotal()">
+                                    <input type="number" name="paid_amount" id="paidAmount" class="form-control mb-2" value="0" step="0.01" 
+                                           onfocus="if(this.value=='0') this.value=''" 
+                                           onblur="if(this.value=='') this.value='0'; calculateTotal()" 
+                                           oninput="calculateTotal()">
 
                                     <div class="d-flex gap-2">
                                         <select name="payment_method" class="form-control form-control-sm">
@@ -160,7 +185,7 @@
                                 </th>
                             </tr>
                             <tr>
-                                <th colspan="2" class="text-end">Due Amount</th>
+                                <th colspan="3" class="text-end">Due Amount</th>
                                 <th><input type="number" id="dueAmount" class="form-control" readonly value="0"></th>
                             </tr>
                         </tfoot>
@@ -190,15 +215,24 @@
             addTest();
             });
 
-        // Reference by Someone Logic
+        // Reference by Someone Logic (Toggle Lists)
         $('#refBySomeone').change(function() {
             if(this.checked) {
-                // Disable and Clear
-                $('#referenceDoctorSelect').val(null).trigger('change');
-                $('#referenceDoctorSelect').prop('disabled', true);
+                // Hide Standard, Show "Someone"
+                $('#refDoctorContainer').hide();
+                $('#refSomeoneContainer').show();
+                
+                // Disable Standard, Enable "Someone"
+                $('#referenceDoctorSelect').prop('disabled', true).val(null).trigger('change');
+                $('#refSomeoneSelect').prop('disabled', false).val(null).trigger('change');
             } else {
-                // Enable
-                $('#referenceDoctorSelect').prop('disabled', false);
+                // Show Standard, Hide "Someone"
+                $('#refDoctorContainer').show();
+                $('#refSomeoneContainer').hide();
+                
+                // Enable Standard, Disable "Someone"
+                $('#referenceDoctorSelect').prop('disabled', false).val(null).trigger('change');
+                $('#refSomeoneSelect').prop('disabled', true).val(null).trigger('change');
             }
         });
 
@@ -234,6 +268,20 @@
             <tr id="row-${id}">
                 <td>${name} <input type="hidden" name="tests[]" value="${id}"></td>
                 <td>${price}</td>
+                <td>
+                    <input type="number" name="test_discounts[]" class="form-control form-control-sm test-discount-flat" 
+                           value="0" min="0" max="${price}" step="0.01" 
+                           onfocus="if(this.value=='0' || this.value=='0.00') this.value=''" 
+                           onblur="if(this.value=='') this.value='0'; syncDiscount(${id}, 'flat')" 
+                           oninput="syncDiscount(${id}, 'flat')">
+                </td>
+                <td>
+                    <input type="number" name="test_discount_percents[]" class="form-control form-control-sm test-discount-percent" 
+                           value="0" min="0" max="100" step="0.01" 
+                           onfocus="if(this.value=='0' || this.value=='0.00') this.value=''" 
+                           onblur="if(this.value=='') this.value='0'; syncDiscount(${id}, 'percent')" 
+                           oninput="syncDiscount(${id}, 'percent')">
+                </td>
                 <td><button type="button" class="btn btn-danger btn-sm" onclick="removeTest(${id}, ${price})">X</button></td>
             </tr>
         `;
@@ -245,6 +293,30 @@
         $('#testSelect').val(null).trigger('change'); // Reset Select2 for next input
     }
 
+    function syncDiscount(id, type) {
+        const row = document.getElementById('row-'+id);
+        const price = parseFloat(row.cells[1].innerText);
+        const flatInput = row.querySelector('.test-discount-flat');
+        const percentInput = row.querySelector('.test-discount-percent');
+
+        if(type === 'flat') {
+            let flat = parseFloat(flatInput.value) || 0;
+            if(flat > price) {
+                flat = price;
+                flatInput.value = flat;
+            }
+            percentInput.value = ((flat / price) * 100).toFixed(2);
+        } else {
+            let percent = parseFloat(percentInput.value) || 0;
+            if(percent > 100) {
+                percent = 100;
+                percentInput.value = percent;
+            }
+            flatInput.value = ((price * percent) / 100).toFixed(2);
+        }
+        calculateTotal();
+    }
+
     // ... (rest of functions: removeTest, updateCalculations, calculateTotal) ...
 
     function removeTest(id, price) {
@@ -254,30 +326,26 @@
     }
 
     function updateCalculations() {
-        document.getElementById('totalAmount').value = total;
+        document.getElementById('totalAmount').value = total.toFixed(2);
         calculateTotal();
     }
 
     function calculateTotal() {
-        let flatDiscount = parseFloat(document.getElementById('discountFlat').value) || 0;
-        let percentDiscount = parseFloat(document.getElementById('discountPercent').value) || 0;
+        let totalDiscount = 0;
+        document.querySelectorAll('.test-discount-flat').forEach(input => {
+            totalDiscount += parseFloat(input.value) || 0;
+        });
+
         let paid = parseFloat(document.getElementById('paidAmount').value) || 0;
 
-        let totalDiscount = flatDiscount + ((total * percentDiscount) / 100);
-
-        // Prevent discount from exceeding total
-        if(totalDiscount > total) {
-             totalDiscount = total;
-        }
-
         // Update hidden input used for submission
-        document.getElementById('finalDiscount').value = Math.round(totalDiscount);
+        document.getElementById('finalDiscount').value = totalDiscount.toFixed(2);
 
-        const net = Math.round(total - totalDiscount);
-        const due = Math.round(net - paid);
+        const net = total - totalDiscount;
+        const due = net - paid;
 
-        document.getElementById('netPayable').value = net;
-        document.getElementById('dueAmount').value = due;
+        document.getElementById('netPayable').value = net.toFixed(2);
+        document.getElementById('dueAmount').value = due.toFixed(2);
     }
 </script>
 @endpush

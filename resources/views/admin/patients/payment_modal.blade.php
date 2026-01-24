@@ -23,12 +23,16 @@
 
                     <div class="mb-3">
                         <label class="form-label">Less Discount (Flat)</label>
-                        <input type="number" name="discount" class="form-control" placeholder="0">
+                        <input type="number" name="discount" class="form-control" placeholder="0" 
+                               onfocus="if(this.value=='0') this.value=''" 
+                               onblur="if(this.value=='') this.value='0'">
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Pay Amount <span class="text-danger">*</span></label>
-                        <input type="number" name="amount" class="form-control" required min="1">
+                        <input type="number" name="amount" class="form-control" required min="1" step="0.01"
+                               onfocus="if(this.value=='0') this.value=''" 
+                               onblur="if(this.value=='') this.value='0'">
                     </div>
 
                     <div class="mb-3">

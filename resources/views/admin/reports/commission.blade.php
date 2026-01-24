@@ -94,7 +94,9 @@
                             
                             @if($status == 'pending')
                             <td>
-                                <input type="number" step="0.01" name="approved_amounts[{{ $commission->id }}]" class="form-control form-control-sm" value="{{ $commission->commission_amount }}">
+                                <input type="number" step="0.01" name="approved_amounts[{{ $commission->id }}]" class="form-control form-control-sm" value="{{ $commission->commission_amount }}"
+                                       onfocus="if(this.value=='0' || this.value=='0.00') this.value=''" 
+                                       onblur="if(this.value=='') this.value='0.00'">
                             </td>
                             @else
                             <td class="fw-bold text-success">{{ $commission->approved_amount }}</td>

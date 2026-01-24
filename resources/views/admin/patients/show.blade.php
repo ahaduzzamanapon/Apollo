@@ -38,7 +38,7 @@
                                     </div>
                                     <div class="mb-2">
                                         <span>Patient Name:</span> <strong>{{ $report->patient->name }}</strong>
-                                        <span style="margin-left: 15px">Age:</span> <strong>{{ $report->patient->age }} {{ $report->patient->age_unit }}</strong>
+                                        <span style="margin-left: 15px">Age:</span> <strong>{{ $report->patient->long_formatted_age }}</strong>
                                         <span style="margin-left: 15px">Gender:</span> <strong>{{ $report->patient->gender }}</strong>
                                     </div>
                                 </div>

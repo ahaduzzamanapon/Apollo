@@ -36,7 +36,9 @@
                     <table class="table table-bordered table-striped mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th>Report ID</th>
+                                <th>Sl. No.</th>
+                                <th>ID No.</th>
+                                <th>Invoive No.</th>
                                 <th>Date</th>
                                 <th>Patient Name</th>
                                 <th>Mobile</th>

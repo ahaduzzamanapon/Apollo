@@ -139,23 +139,6 @@
 
 <body >
 
-<!-- ================= WATERMARK ================= -->
-{{-- @php
-    $center = \App\Models\CenterDetails::first();
-    $logoBase64 = null;
-    if ($center && $center->logo_image) {
-        $logoPath = public_path('storage/' . $center->logo_image);
-        if (file_exists($logoPath)) {
-            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        }
-    }
-@endphp --}}
-{{--
-@if($logoBase64)
-<div class="watermark" style="background-image: url('{{ $logoBase64 }}');"></div>
-@endif --}}
 
 <!-- ================= HEADER (ALL PAGES) ================= -->
 <div class="header">
@@ -187,7 +170,7 @@
                 <div style="font-size: 18px; font-weight: bold; color: #1e4981; font-family: 'kalpurush', sans-serif;">{{ $center->name_bn }}</div>
                 <div style="font-size: 18px; font-weight: bold; color: #c0392b; text-transform: uppercase;">{{ $center->name_en }}</div>
                 <div style="font-size: 10px; color: #0a7c3a;">{{ $center->about }}</div>
-                <div style="font-size: 9px; margin-top: 2px;">{{ $center->address }} | Mobile: {{ $center->phone }}</div>
+                <div style="font-size: 9px; margin-top: 2px;">{{ $center->address }}  Mobile: {{ $center->phone }}</div>
             </td>
         </tr>
     </table>
@@ -198,8 +181,8 @@
 <div style="height: 25mm;"></div>
 
 <!-- ================= FOOTER (ALL PAGES) ================= -->
-<div style="margin-top: 20px;margin-bottom: 10px;" >
-    <span style="font-size: 12px;">Bill No: <strong>{{ $report->report_code }}</strong></span>
+<div style="margin-top: 20px;margin-bottom: 15px;" >
+    <span style="font-size: 14px;">Bill No: <strong>{{ $report->report_code }}</strong></span>
     {!! \App\Services\BarcodeService::getHtmlImg($report->report_code, ['style' => 'height: 25px;width: 200px;float: right']) !!}
 </div>
 
@@ -225,113 +208,117 @@
                 <td style="width: 18%; padding: 2px 5px;white-space:nowrap"><strong style="word-wrap: break-word; overflow-wrap: break-word;">{{ $report->patient->name }}</strong></td>
                 <td style="width: 14%; padding: 2px 5px;white-space:nowrap"><span>Age</span></td>
                 <td style="width: 2%; padding: 2px 2px; text-align: center; font-weight: bold;">:</td>
-                <td style="width: 18%; padding: 2px 5px;white-space:nowrap"><strong>{{ $report->patient->age }} {{ $report->patient->age_unit }}</strong></td>
+                <td style="width: 18%; padding: 2px 5px;white-space:nowrap"><strong>{{ $report->patient->long_formatted_age }}</strong></td>
                 <td style="width: 14%; padding: 2px 5px;white-space:nowrap"><span>Gender</span></td>
                 <td style="width: 2%; padding: 2px 2px; text-align: center; font-weight: bold;">:</td>
                 <td style="width: 16%; padding: 2px 5px;white-space:nowrap"><strong>{{ $report->patient->gender }}</strong></td>
             </tr>
+            <tr>
+                <td style="padding:2px 5px;white-space:nowrap">Ref. Doctor</td>
+                <td style="padding:2px 2px; text-align: center; font-weight: bold;">:</td>
+                <td colspan="7" style="padding:2px 5px;white-space:nowrap">
+                    <strong>{{ $report->referenceDoctor->name ?? 'Self' }}</strong>
+                </td>
+
         </table>
-        <div class="d-flex flex-row mb-2">
-            <div class="d-flex flex-column" style="padding: 2px 5px;">
-                Ref. By: <strong>{{ $report->referenceDoctor->name ?? 'Self' }}</strong></div>
-            </div>
+
     </div>
 </div>
-<!-- ================= TEST LIST (22 PER PAGE) ================= -->
-@php
-    $chunks = $report->tests->chunk(22);
-@endphp
+    <!-- ================= TEST LIST (22 PER PAGE) ================= -->
+    @php
+        $chunks = $report->tests->chunk(22);
+    @endphp
 
-@foreach($chunks as $index => $tests)
+    @foreach($chunks as $index => $tests)
 
-    @if($index > 0)
-        <div class="page-break"></div>
-    @endif
+        @if($index > 0)
+            <div class="page-break"></div>
+        @endif
 
-    <table class="items-table mt-2" style="margin-top: 10px;">
-        <thead>
-            <tr>
-                <th style="font-size:15px   ">Test Name</th>
-                <th style="font-size:15px   " width="20%" class="text-end">Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($tests as $test)
-            <tr>
-                <td style="font-size:15px;font-weight: bold">{{ $test->category->test_name }}</td>
-                <td style="font-size:15px;font-weight: bold" class="text-end">{{ number_format($test->price, 0) }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+        <table class="items-table mt-2" style="margin-top: 10px;">
+            <thead>
+                <tr>
+                    <th style="font-size:15px   ">Test Name</th>
+                    <th style="font-size:15px   " width="20%" class="text-end">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($tests as $test)
+                <tr>
+                    <td style="font-size:15px;">{{ $test->category->test_name }}</td>
+                    <td style="font-size:15px;" class="text-end">{{ number_format($test->price, 0) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-    <!-- ================= TOTALS (LAST PAGE ONLY) ================= -->
-    @if($loop->last)
+        <!-- ================= TOTALS (LAST PAGE ONLY) ================= -->
+        @if($loop->last)
 
-        <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 20px;">
-            <div style="width: 40%;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <td style="font-size: 20px; font-weight: bold; padding: 3px;">Note:</td>
-                        <td style="font-size: 30px; padding: 3px;font-weight: bold; text-align: center;">
-                            @if($report->due_amount == 0)
-                                <span style="display: inline-block;font-weight: bold ;padding: 5px 15px; border: 1px solid #28a745; color: #28a745; font-size: 30px; font-weight: bold; border-radius: 5px;">PAID</span>
-                            @else
-                                <span style="display: inline-block;font-weight: bold; padding: 5px 15px; border: 1px solid #dc3545; color: #dc3545; font-size: 30px; font-weight: bold; border-radius: 5px;white-space:nowrap">DUE : {{ number_format($report->due_amount, 0) }} TK.</span>
-                            @endif
-                        </td>
-                    </tr>
-                </table>
+            <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 20px;">
+                <div style="width: 40%;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="font-size: 20px; font-weight: bold; padding: 3px;">Note:</td>
+                            <td style="font-size: 30px; padding: 3px;font-weight: bold; text-align: center;">
+                                @if($report->due_amount == 0)
+                                    <span style="display: inline-block;font-weight: bold ;padding: 5px 15px; border: 1px solid #28a745; color: #28a745; font-size: 30px; font-weight: bold; border-radius: 5px;">PAID</span>
+                                @else
+                                    <span style="display: inline-block;font-weight: bold; padding: 5px 15px; border: 1px solid #dc3545; color: #dc3545; font-size: 30px; font-weight: bold; border-radius: 5px;white-space:nowrap">DUE : {{ number_format($report->due_amount, 0) }}</span>
+                                @endif
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="width: 60%;">
+                    <table class="totals-table" style="font-size:15px; margin-left: auto;">
+                        <tr>
+                            <th style="font-size:15px">Total</th>
+                            <td style="font-size:15px" class="text-end">{{ number_format($report->total_amount, 0) }}</td>
+                        </tr>
+                        <tr>
+                            <th style="font-size:15px">Discount</th>
+                            <td style="font-size:15px" class="text-end">{{ number_format($report->discount, 0) }}</td>
+                        </tr>
+                        <tr>
+                            <th style="font-size:15px">Net Payable</th>
+                            <td style="font-size:15px" class="text-end">
+                                <strong>{{ number_format($report->final_amount, 0) }}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="font-size:15px">Paid</th>
+                            <td style="font-size:15px" class="text-end">{{ number_format($report->paid_amount, 0) }}</td>
+                        </tr>
+                        <tr>
+                            <th style="font-size:15px">Due</th>
+                            <td style="font-size:15px" class="text-end">{{ number_format($report->due_amount, 0) }}</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
-            <div style="width: 60%;">
-                <table class="totals-table" style="font-size:15px; margin-left: auto;">
-                    <tr>
-                        <th style="font-size:15px">Total</th>
-                        <td style="font-size:15px" class="text-end">{{ number_format($report->total_amount, 0) }}</td>
-                    </tr>
-                    <tr>
-                        <th style="font-size:15px">Discount</th>
-                        <td style="font-size:15px" class="text-end">{{ number_format($report->discount, 0) }}</td>
-                    </tr>
-                    <tr>
-                        <th style="font-size:15px">Net Payable</th>
-                        <td style="font-size:15px" class="text-end">
-                            <strong>{{ number_format($report->final_amount, 0) }}</strong>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th style="font-size:15px">Paid</th>
-                        <td style="font-size:15px" class="text-end">{{ number_format($report->paid_amount, 0) }}</td>
-                    </tr>
-                    <tr>
-                        <th style="font-size:15px">Due</th>
-                        <td style="font-size:15px" class="text-end">{{ number_format($report->due_amount, 0) }}</td>
-                    </tr>
-                </table>
-            </div>
+        @endif
+
+        <div class="footer" >
+            <p class="bangla-text" style="font-size: 14px;">
+                রিপোর্ট সংগ্রহের শেষ সময় রাত ১১.০০, রিপোর্ট নেয়ার সময় রিসিট অবশ্যই সাথে আনতে হবে
+            </p>
+
+            <p class="bangla-text bangla-vertical" style="font-size: 14px;">
+                ডেলিভারী তারিখ হতে ৩০ দিনের মধ্যে রিপোর্ট সংগ্রহ করা যাবে
+            </p>
+
+            <p class="bangla-text" style="border-bottom:1px solid #000;font-size: 12px;">
+                {{ $center->address }} মোবাইলঃ {{ $center->phone }}
+            </p>
+
+            <p style="font-size: 14px;">
+                Prepared By: {{ auth()->user()->name }} |
+                Printed: {{ date('d M, Y h:i A') }}
+            </p>
         </div>
-    @endif
 
-    <div class="footer" >
-    <p class="bangla-text" style="font-size: 14px;">
-        রিপোর্ট সংগ্রহের শেষ সময় রাত ১১.০০, রিপোর্ট নেয়ার সময় রিসিট অবশ্যই সাথে আনতে হবে
-    </p>
-
-    <p class="bangla-text bangla-vertical" style="font-size: 14px;">
-        ডেলিভারী তারিখ হতে ৩০ দিনের মধ্যে রিপোর্ট সংগ্রহ করা যাবে
-    </p>
-
-    <p class="bangla-text" style="border-bottom:1px solid #000;font-size: 12px;">
-        {{ $center->address }} মোবাইলঃ {{ $center->phone }}
-    </p>
-
-    <p style="font-size: 14px;">
-        Prepared By: {{ auth()->user()->name }} |
-        Printed: {{ date('d M, Y h:i A') }}
-    </p>
-</div>
-
-@endforeach
+    @endforeach
 
 </body>
 </html>

@@ -178,8 +178,9 @@ class PatientController extends Controller
         $request->validate([
             'patient_name' => 'required|string',
             'mobile' => 'required|string',
-            'age' => 'required|integer',
-            'age_unit' => 'required|in:Years,Months,Days',
+            'age_years' => 'nullable|integer|min:0',
+            'age_months' => 'nullable|integer|min:0|max:11',
+            'age_days' => 'nullable|integer|min:0|max:30',
             'gender' => 'required|in:Male,Female,Other',
             'report_date' => 'required|date',
             'reference_doctor_id' => 'nullable|exists:doctors,id',
@@ -190,26 +191,39 @@ class PatientController extends Controller
         ]);
 
         return \DB::transaction(function () use ($request) {
-            // Calculate DOB based on Age & Unit
-        $dob = null;
-        if ($request->age_unit == 'Years') {
-            $dob = Carbon::now()->subYears($request->age);
-        } elseif ($request->age_unit == 'Months') {
-            $dob = Carbon::now()->subMonths($request->age);
-        } elseif ($request->age_unit == 'Days') {
-            $dob = Carbon::now()->subDays($request->age);
-        }
+            // Calculate DOB based on Age (Years, Months, Days)
+            $years = $request->age_years ?? 0;
+            $months = $request->age_months ?? 0;
+            $days = $request->age_days ?? 0;
 
-        // 1. Create or Find Patient
-        $patient = Patient::create([
-            'name' => $request->patient_name,
-            'mobile' => $request->mobile,
-            'nid' => $request->nid,
-            'age' => $request->age,
-            'age_unit' => $request->age_unit,
-            'dob' => $dob,
-            'gender' => $request->gender,
-        ]);
+            $dob = Carbon::now()->subYears($years)->subMonths($months)->subDays($days);
+
+            // Determine primary age and unit for compatibility
+            if ($years > 0) {
+                $compAge = $years;
+                $compUnit = 'Years';
+            } elseif ($months > 0) {
+                $compAge = $months;
+                $compUnit = 'Months';
+            } else {
+                $compAge = $days;
+                $compUnit = 'Days';
+            }
+
+            // 1. Create or Find Patient
+            $patient = Patient::create([
+                'name' => $request->patient_name,
+                'mobile' => $request->mobile,
+                'nid' => $request->nid,
+                'age' => [
+                    'years' => $years,
+                    'months' => $months,
+                    'days' => $days,
+                ],
+                'age_unit' => 'JSON', // Placeholder since we now use JSON in age
+                'dob' => $dob,
+                'gender' => $request->gender,
+            ]);
 
         // Generate Unique ID (Daily Resetting ID)
         $today = Carbon::today();
@@ -236,12 +250,13 @@ class PatientController extends Controller
 
         // 3. Add Tests & Calculate Totals
         $totalAmount = 0;
+        $totalDiscount = 0;
         $testData = [];
         $totalRawCommission = 0;
 
         // Fetch doctor honorariums
         $doctorHonorariums = [];
-        if ($request->reference_doctor_id && !$request->has('ref_by_someone')) { // Check ref_by_someone logic too
+        if ($request->reference_doctor_id && !$request->has('ref_by_someone')) {
             $doctor = Doctor::with('honorariums')->find($request->reference_doctor_id);
             if($doctor) {
                  foreach ($doctor->honorariums as $honorarium) {
@@ -251,15 +266,20 @@ class PatientController extends Controller
         }
 
         // Pass 1: Calculate Totals and Raw Commissions
-        foreach ($request->tests as $categoryId) {
+        foreach ($request->tests as $index => $categoryId) {
             $category = ReportCategory::find($categoryId);
             if(!$category) continue;
 
             $price = $category->price;
             $totalAmount += $price;
 
+            // Get individual test discount
+            $testDiscount = isset($request->test_discounts[$index]) ? (float)$request->test_discounts[$index] : 0;
+            $testDiscountPercent = isset($request->test_discount_percents[$index]) ? (float)$request->test_discount_percents[$index] : 0;
+            $totalDiscount += $testDiscount;
+
             $commission = 0;
-            // Only calculate commission if NOT ref_by_someone (though handled by empty array above, safety check)
+            // Only calculate commission if NOT ref_by_someone
             if (!$request->has('ref_by_someone')) {
                 if (isset($doctorHonorariums[$categoryId])) {
                     $hon = $doctorHonorariums[$categoryId];
@@ -276,18 +296,18 @@ class PatientController extends Controller
             $testData[] = [
                 'category_id' => $categoryId,
                 'price' => $price,
+                'discount' => $testDiscount,
+                'discount_percent' => $testDiscountPercent,
                 'raw_commission' => $commission,
             ];
         }
 
         // Apply Discount Logic to Commission
         // User Logic: Doctor Commission = Total Commission - Patient Discount
-        // If Discount > Commission, Doctor gets 0.
-        $patientDiscount = $request->discount ?? 0;
+        $patientDiscount = $totalDiscount;
         $netTotalCommission = max(0, $totalRawCommission - $patientDiscount);
 
         // Calculate adjustment factor to distribute net commission back to tests
-        // Avoid division by zero
         $commissionFactor = $totalRawCommission > 0 ? ($netTotalCommission / $totalRawCommission) : 0;
 
         // Pass 2: Create PatientTest Records
@@ -298,16 +318,19 @@ class PatientController extends Controller
             $report->tests()->create([
                 'report_category_id' => $data['category_id'],
                 'price' => $data['price'],
+                'discount' => $data['discount'],
+                'discount_percent' => $data['discount_percent'],
                 'commission_amount' => $finalCommission,
             ]);
         }
 
         // 4. Update Report Totals
-        $finalAmount = $totalAmount - ($request->discount ?? 0);
+        $finalAmount = $totalAmount - $totalDiscount;
         $dueAmount = $finalAmount - ($request->paid_amount ?? 0);
 
         $report->update([
             'total_amount' => $totalAmount,
+            'discount' => $totalDiscount,
             'final_amount' => $finalAmount,
             'due_amount' => max(0, $dueAmount),
         ]);

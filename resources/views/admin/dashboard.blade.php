@@ -17,7 +17,7 @@
         transform: translateY(-5px);
         box-shadow: 0 15px 30px rgba(0,0,0,0.1);
     }
-    
+
     .card-body {
         position: relative;
         z-index: 2;
@@ -73,7 +73,7 @@
     .bg-daily-expense { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); color: white; }
     .bg-daily-balance { background: linear-gradient(135deg, #1fa2ff 0%, #12d8fa 100%); color: white; }
     .bg-daily-honorarium { background: linear-gradient(135deg, #f09819 0%, #edde5d 100%); color: white; }
-    
+
     .bg-daily-income .icon-box { background: rgba(255,255,255,0.2); }
     .bg-daily-expense .icon-box { background: rgba(255,255,255,0.2); }
     .bg-daily-balance .icon-box { background: rgba(255,255,255,0.2); }
@@ -88,7 +88,7 @@
 
     .bg-monthly .card-value { color: #333; }
     .bg-monthly .card-label { color: #666; }
-    
+
     /* All Time Section - Dark/Solid */
     .bg-all-due { background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); color: white; }
     .bg-all-patients { background: linear-gradient(135deg, #232526 0%, #414345 100%); color: white; }
@@ -174,7 +174,7 @@
             </div>
         </a>
     </div>
-    
+
     <!-- 4. Total Doctor Honorium Daily -->
     <div class="col-md-3">
         <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#honorariumModal">
@@ -191,7 +191,7 @@
             </div>
         </a>
     </div>
-    
+
     <!-- 5. Total Daily Expenses -->
     <div class="col-md-4">
         <a href="#" class="daily-card" data-bs-toggle="modal" data-bs-target="#expenseModal">
@@ -335,7 +335,7 @@
         position: relative;
         z-index: 1050 !important; /* Higher than card z-index */
     }
-    
+
     /* Ensure Modal is above everything */
     .modal {
         z-index: 1060 !important;
@@ -378,10 +378,28 @@
             </div>
             <div class="modal-body">
                 <table class="table table-bordered">
-                    <thead><tr><th>Invoice</th><th>Patient</th><th>Tests</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Sl. No.</th>
+                            <th>ID No.</th>
+                            <th>Invoice</th>
+                            <th>Patient</th>
+                            <th>Tests</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach($todayReportList as $item)
-                        <tr><td>#{{ $item->invoice_no }}</td><td>{{ $item->patient->name ?? '-' }}</td><td>{{ $item->tests->count() }} Tests</td></tr>
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $item->daily_id ?? $item->id }}</td>
+                            <td>{{ $item->report_code }}</td>
+                            <td>{{ $item->patient->name ?? '-' }}</td>
+                            <td>
+                                @foreach($item->tests as $test)
+                                    <span class="badge bg-primary">{{ $test->category->test_name ?? '-' }}</span>
+                                @endforeach
+                            </td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -504,10 +522,26 @@
             </div>
             <div class="modal-body">
                 <table class="table table-bordered">
-                    <thead><tr><th>Name</th><th>Mobile</th><th>Age</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Sl. No.</th>
+                            <th>ID No.</th>
+                            <th>Invoice No.</th>
+                            <th>Patient Name</th>
+                            <th>Mobile</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        @foreach($todayPatientList as $item)
-                        <tr><td>{{ $item->name }}</td><td>{{ $item->mobile }}</td><td>{{ $item->age }}</td></tr>
+                        @foreach($todayReportList as $item)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $item->daily_id ?? $item->id }}</td>
+                            <td>{{ $item->report_code }}</td>
+                            <td>{{ $item->patient->name }}</td>
+                            <td>{{ $item->patient->mobile }}</td>
+                            <td class="fw-bold">{{ $item->total_amount }}</td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>

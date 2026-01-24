@@ -17,6 +17,7 @@ class ReportBillingController extends Controller
             ->whereHas('report', function($q) {
                 // Only show commissions for paid invoices
                 $q->whereNotNull('reference_doctor_id')
+                  ->where('ref_by_someone', 0)
                   ->where('due_amount', 0);
             })
             ->where('approval_status', $status);

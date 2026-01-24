@@ -27,7 +27,8 @@ class AccountsReportController extends Controller
         // Commissions (Probable - based on Report Date)
         $commissions = PatientTest::with('report')
             ->whereHas('report', function($q) use ($startDate, $endDate) {
-                $q->whereBetween('report_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+                $q->whereBetween('report_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+                  ->where('ref_by_someone', 0);
             })
             ->get()
             ->groupBy(function($item) { return Carbon::parse($item->report->report_date)->format('Y-m-d'); });
